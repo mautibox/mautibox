@@ -6,11 +6,14 @@
 # Prep:
 # composer global require hirak/prestissimo
 
-FREQUENCY=1
+FREQUENCY=10
 BASEDIR=$(dirname "$BASH_SOURCE")
 BASEDIR=$( pwd )
 STAGING="$BASEDIR/staging"
 PR="$BASEDIR/pr/$1"
+
+mkdir -p "$BASEDIR/pr"
+mkdir -p "$BASEDIR/status"
 
 if [ -z "$1" ] 
 then
@@ -18,11 +21,14 @@ then
 	exit 1
 fi
 
-if [ -z $(find "$PR/app/bootstrap.php.cache" -mmin +$FREQUENCY) ]
+if [ ! -z $(find "$PR/app/bootstrap.php.cache" -mmin -$FREQUENCY 2>/dev/null) ]
 then
 	echo "PR is recent enough."
 else
-	if [ -z $(find "$STAGING/app/bootstrap.php.cache" -mmin +$FREQUENCY) ]
+	mkdir -p "$PR"
+	echo "{'status': 'building'}" > "$BASEDIR/status/$1.json"
+
+	if [ ! -z $(find "$STAGING/app/bootstrap.php.cache" -mmin -$FREQUENCY 2>/dev/null) ]
 	then
 		echo "Staging branch recent enough"
 	else
@@ -59,16 +65,37 @@ else
 	fi
 
 	echo "Creating/updating pull request workspace"
-	mkdir -p "$BASEDIR/pr"
 	rsync -aLrqW --delete --force "$STAGING/" "$PR"
+	if [ $? == 0 ]
+	then
+		echo "Failed sync!"
+		exit 1
+	fi
 
 	echo "Applying pull request patch"
 	cd "$PR"
 	curl -L "https://github.com/mautic/mautic/pull/$1.diff" | git apply -v
 
-	if [ ! $? -eq 0 ]
+	if [ $? == 0 ]
 	then
 		echo "Failed patch!"
 		exit 1
 	fi
+
+	echo "Getting mailhog config"
+	# TODO
+
+	echo "Creating path rules"
+	# Log everything to one file.
+	# Set mailhog settings and other perms.
+
+	echo "Creating parameters file"
+	# TODO
+
+	echo "Creating/updating database"
+	console doctrine:database:create --no-interaction --if-not-exists
+	console mautic:install:data -n -vvv
+	console doctrine:migrations:version --add --all --no-interaction -vvv
+
+	echo "{'status': 'building'}" > "$BASEDIR/status/$1.json"
 fi
