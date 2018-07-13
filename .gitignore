@@ -1,6 +1,5 @@
-pr
-staging
-status
+.*
+code
 mail
 logs
 home
