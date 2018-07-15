@@ -13,6 +13,7 @@ $container->setParameter('mautic.security.disableUpdates', true);
 $container->setParameter('mautic.rss_notification_url', null);
 $container->setParameter('mautic.db_table_prefix', PULL);
 $container->setParameter('mautic.tmp_path', '/tmp/'.PULL);
+$container->setParameter('mautic.db_driver', 'pdo_mysql');
 $container->setParameter('mautic.db_host', getenv('DB_HOST'));
 putenv('DB_HOST=');
 $container->setParameter('mautic.db_port', getenv('DB_PORT'));

@@ -9,6 +9,7 @@
 # Paths:
 #    /code/pulls                Pull requests
 #    /code/pulls/xxxx           Pull request
+#    /code/pulls/xxxx/.patches/ Patches applied to the build.
 #    /code/stage                Working copy of the core repo with permissions applied for faster local cloning.
 #
 #    /www/data/xxxx/statis.json Current status of the PR in question.
@@ -32,10 +33,19 @@
 FREQUENCY=5
 BASEDIR=$(dirname "$BASH_SOURCE")
 BASEDIR=$( pwd )
+REPO="https://github.com/mautic/mautic"
+PULLNO="$1"
 STAGE="$BASEDIR/code/stage"
-DATA="$BASEDIR/code/data/$1"
-PULL="$BASEDIR/code/pulls/$1"
+DATA="$BASEDIR/code/data/$PULLNO"
+PULL="$BASEDIR/code/pulls/$PULLNO"
+PATCH="$BASEDIR/code/pulls/$PULLNO/.patches/$PULLNO.patch"
 OVERRIDES="$BASEDIR/overrides"
+DATE=""
+SHA=""
+NEWSHA=""
+OLDPATCH=""
+NEWPATCH=""
+CHANGES=0
 
 if [ -z "$1" ]
 then
@@ -52,94 +62,135 @@ function console {
     fi
 }
 
-if [ ! -z $(find "$PULL/app/bootstrap.php.cache" -mmin -$FREQUENCY 2>/dev/null) ]
+function status {
+    echo "New status: $1"
+    echo "{'sha':'$SHA','date':'$DATE','pull':$PULLNO,'status':'$1'}" > "$DATA/status.json"
+}
+
+if [ ! -z $( find "$PATCH" -mmin -$FREQUENCY 2>/dev/null ) ]
 then
     echo "The PULL is recent enough. Builds permitted every $FREQUENCY minutes."
 else
-    mkdir -p "$DATA"
-    cd "$DATA"
-    chown -R webapp:webapp .
-    chgrp -R webapp .
-    chmod -R ug+wx .
+    # Prep folders
+    if [ ! -d "$DATA" ]
+    then
+        status 'building'
+        mkdir -p "$DATA" "$PULL"
+        cd "$DATA"
+        chown -R webapp:webapp .
+        chgrp -R webapp .
+        chmod -R ug+wx .
+    else
+        status 'updating'
+    fi
 
-    mkdir -p "$PULL"
-    echo "{'pull':$1,'status':'building'}" > "$DATA/status.json"
-
-    if [ ! -z $(find "$STAGE/app/bootstrap.php.cache" -mmin -$FREQUENCY 2>/dev/null) ]
+    # Create/update stage as needed.
+    if [ ! -z $( find "$STAGE/app/bootstrap.php.cache" -mmin -$FREQUENCY 2>/dev/null ) ]
     then
         echo "Staging working copy is recent enough. Builds permitted every $FREQUENCY minutes."
+        cd "$STAGE"
+        NEWSHA=$( git rev-parse --short HEAD )
     else
-        echo "Refreshing staging branch"
+        echo "Refreshing stage"
         if [ ! -d "$STAGE" ]
         then
-            git clone -b staging --single-branch --depth 1 https://github.com/mautic/mautic.git "$STAGE"
+            git clone -b staging --single-branch --depth 1 $REPO.git "$STAGE"
+            cd "$STAGE"
+        else
+            cd "$STAGE"
+            SHA=$( git rev-parse --short HEAD )
         fi
-        cd "$STAGE"
         git clean -fd
         git reset --hard HEAD
         git pull
-        composer install --no-scripts --no-progress --no-suggest
-        touch app/bootstrap.php.cache \
-            app/config/local.php
-        mkdir -p app/cache \
-            app/logs \
-            app/spool \
-            media/files \
-            translations
-        chown -R webapp:webapp .
-        chgrp -R webapp . \
-            app/bootstrap.php.cache \
-            media \
-            app/cache \
-            app/logs
-        chmod -R u+rwX,go+rX,go-w .
-        chmod -R ug+wx app/bootstrap.php.cache \
-            app/config/local.php \
-            media \
-            app/cache \
-            app/logs
+        NEWSHA=$( git rev-parse --short HEAD )
+        if [ ! "$NEWSHA" -eq "$SHA" ]
+        then
+            # Git repository changes detected
+            composer install --no-scripts --no-progress --no-suggest
+            touch app/bootstrap.php.cache \
+                app/config/local.php
+            mkdir -p app/cache \
+                app/logs \
+                app/spool \
+                media/files \
+                translations
+            chown -R webapp:webapp .
+            chgrp -R webapp . \
+                app/bootstrap.php.cache \
+                media \
+                app/cache \
+                app/logs
+            chmod -R u+rwX,go+rX,go-w .
+            chmod -R ug+wx app/bootstrap.php.cache \
+                app/config/local.php \
+                media \
+                app/cache \
+                app/logs
+        fi
     fi
 
-    echo "Creating/updating pull request workspace"
-    rsync -aLrqW --delete --force "$STAGE/" "$PULL"
-    if [ $? != 0 ]
+    # Create/updated pull request folder.
+    if [ -d "$PULL" ]
     then
-        echo "Failed sync!"
-        exit 1
+        cd "$PULL"
+        SHA=$( git rev-parse --short HEAD )
     fi
-
-    echo "Applying pull request patch"
-    cd "$PULL"
-    curl -L "https://github.com/mautic/mautic/pull/$1.diff" | git apply -v
-
-    if [ $? != 0 ]
+    if [ ! "$NEWSHA" -eq "$SHA" ]
     then
-        echo "Failed patch!"
-        exit 1
+        echo "Syncing pull request workspace"
+        rsync -aLrqW --delete --force "$STAGE/" "$PULL"
+        if [ $? != 0 ]
+        then
+            status 'error'
+            echo "Failed sync!"
+            exit 1
+        fi
+        CHANGES=1
     fi
 
-    echo "Getting mailhog config"
-    # TODO
+    # Check if a patch is needed or has already been applied.
+    if [ -f "$PATCH" ]
+    then
+        OLDPATCH=$( cat "$PATCH" )
+    fi
+    NEWPATCH=$( curl -sL "$REPO/pull/$1.patch" )
+    if [ ! "$OLDPATCH" -eq "$NEWPATCH" ]
+    then
+        cd "$PULL"
+        echo "$NEWPATCH" | git apply -v
+        if [ $? != 0 ]
+        then
+            status 'error'
+            echo "Failed patch!"
+            exit 1
+        fi
+        echo "$NEWPATCH" > "$PATCH"
+        CHANGES=1
+    fi
 
-    # echo "Creating path rules"
-    # Log everything to one file.
-    # Set mailhog settings and other perms.
+    # If there were no changes, end.
+    if [ ! "$CHANGES" -eq 1 ]
+    then
+        echo "Existing environment is up to date."
+        exit
+    fi
 
-    echo "Syncing custom parameter files"
+    echo "Syncing overrides"
     rsync -avh --update "$OVERRIDES/" "$PULL"
 
-    echo "Clearing cache"
-    rm -rf "$PULL/app/cache/*"
-
-    echo "Clearing temp"
-    rm -rf "/tmp/$1"
+    echo "Clearing cache and tmp"
+    rm -rf "/tmp/$1" "$PULL/app/cache/*"
     mkdir -p "/tmp/$1"
 
-    echo "Creating/updating database"
+    echo "Building/updating database"
     cd "$PULL"
     console doctrine:database:create --no-interaction --if-not-exists
     console mautic:install:data -n -vvv
     console doctrine:migrations:version --add --all --no-interaction -vvv
 
-    echo "{'pull':$1,'status':'ready'}" > "$DATA/status.json"
+    cd "$PULL"
+    SHA=$( git rev-parse --short HEAD )
+    DATE=$( git log -1 --format=%cd )
+    status 'ready'
 fi
