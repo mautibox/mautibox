@@ -30,7 +30,7 @@
 # Prep:
 # composer global require hirak/prestissimo
 
-FREQUENCY=5
+FREQUENCY=1
 BASEDIR=$(dirname "$BASH_SOURCE")
 BASEDIR=$( pwd )
 REPO="https://github.com/mautic/mautic"
@@ -38,6 +38,7 @@ PULLNO="$1"
 STAGE="$BASEDIR/code/stage"
 DATA="$BASEDIR/code/data/$PULLNO"
 PULL="$BASEDIR/code/pulls/$PULLNO"
+PATCHDIR="$BASEDIR/code/pulls/$PULLNO/.patches"
 PATCH="$BASEDIR/code/pulls/$PULLNO/.patches/$PULLNO.patch"
 OVERRIDES="$BASEDIR/overrides"
 DATE=""
@@ -71,17 +72,18 @@ if [ ! -z $( find "$PATCH" -mmin -$FREQUENCY 2>/dev/null ) ]
 then
     echo "The PULL is recent enough. Builds permitted every $FREQUENCY minutes."
 else
-    # Prep folders
-    if [ ! -d "$DATA" ]
+    if [ ! -d "$PULL" ]
     then
         status 'building'
-        mkdir -p "$DATA" "$PULL"
-        cd "$DATA"
-        chown -R webapp:webapp .
-        chgrp -R webapp .
-        chmod -R ug+wx .
-    else
-        status 'updating'
+    fi
+
+    # Prep data folder.
+    if [ ! -d "$DATA" ]
+    then
+        mkdir -p "$DATA"
+        chown -R webapp:webapp "$DATA"
+        chgrp -R webapp "$DATA"
+        chmod -R ug+wx "$DATA"
     fi
 
     # Create/update stage as needed.
@@ -104,7 +106,7 @@ else
         git reset --hard HEAD
         git pull
         NEWSHA=$( git rev-parse --short HEAD )
-        if [ ! "$NEWSHA" -eq "$SHA" ]
+        if [ "$NEWSHA" != "$SHA" ]
         then
             # Git repository changes detected
             composer install --no-scripts --no-progress --no-suggest
@@ -136,11 +138,12 @@ else
         cd "$PULL"
         SHA=$( git rev-parse --short HEAD )
     fi
-    if [ ! "$NEWSHA" -eq "$SHA" ]
+    if [ "$NEWSHA" != "$SHA" ]
     then
         echo "Syncing pull request workspace"
+        mkdir -p "$PULL"
         rsync -aLrqW --delete --force "$STAGE/" "$PULL"
-        if [ $? != 0 ]
+        if [ $? -ne 0 ]
         then
             status 'error'
             echo "Failed sync!"
@@ -150,30 +153,44 @@ else
     fi
 
     # Check if a patch is needed or has already been applied.
+    NEWPATCH=$( curl -sL "$REPO/pull/$1.patch" )
+    if [ -z "$NEWPATCH" ]
+    then
+        status 'error'
+        echo "Patch diff is empty"
+        exit 1
+    fi
     if [ -f "$PATCH" ]
     then
         OLDPATCH=$( cat "$PATCH" )
     fi
-    NEWPATCH=$( curl -sL "$REPO/pull/$1.patch" )
-    if [ ! "$OLDPATCH" -eq "$NEWPATCH" ]
+    if [ "$OLDPATCH" != "$NEWPATCH" ]
     then
         cd "$PULL"
         echo "$NEWPATCH" | git apply -v
-        if [ $? != 0 ]
+        if [ $? -ne 0 ]
         then
             status 'error'
             echo "Failed patch!"
             exit 1
         fi
+        mkdir -p "$PATCHDIR"
         echo "$NEWPATCH" > "$PATCH"
         CHANGES=1
     fi
 
     # If there were no changes, end.
-    if [ ! "$CHANGES" -eq 1 ]
+    if [ "$CHANGES" -ne 1 ]
     then
         echo "Existing environment is up to date."
         exit
+    fi
+
+    if [[ "$NEWPATCH" = *"composer."* ]]
+    then
+        echo "Possible composer changes detected"
+        cd "$PULL"
+        composer install --no-scripts --no-progress --no-suggest
     fi
 
     echo "Syncing overrides"
@@ -183,11 +200,11 @@ else
     rm -rf "/tmp/$1" "$PULL/app/cache/*"
     mkdir -p "/tmp/$1"
 
-    echo "Building/updating database"
-    cd "$PULL"
-    console doctrine:database:create --no-interaction --if-not-exists
-    console mautic:install:data -n -vvv
-    console doctrine:migrations:version --add --all --no-interaction -vvv
+#    echo "Building/updating database"
+#    cd "$PULL"
+#    console doctrine:database:create --no-interaction --if-not-exists
+#    console mautic:install:data -n -vvv
+#    console doctrine:migrations:version --add --all --no-interaction -vvv
 
     cd "$PULL"
     SHA=$( git rev-parse --short HEAD )
