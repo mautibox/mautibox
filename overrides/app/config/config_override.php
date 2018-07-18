@@ -14,18 +14,12 @@ $container->setParameter('mautic.rss_notification_url', null);
 $container->setParameter('mautic.db_table_prefix', PULL);
 $container->setParameter('mautic.tmp_path', '/tmp/'.PULL);
 $container->setParameter('mautic.db_driver', 'pdo_mysql');
-$container->setParameter('mautic.db_host', getenv('DB_HOST'));
-putenv('DB_HOST=');
-$container->setParameter('mautic.db_port', getenv('DB_PORT'));
-putenv('DB_PORT=');
-$container->setParameter('mautic.db_name', getenv('DB_NAME'));
-putenv('DB_NAME=');
-$container->setParameter('mautic.db_user', getenv('DB_USER'));
-putenv('DB_USER=');
-$container->setParameter('mautic.db_password', getenv('DB_PASSWD'));
-putenv('DB_PASSWD=');
+$container->setParameter('mautic.db_host', getenv('RDS_HOSTNAME')); putenv('RDS_HOSTNAME=');
+$container->setParameter('mautic.db_port', getenv('RDS_PORT')); putenv('RDS_PORT=');
+$container->setParameter('mautic.db_name', getenv('RDS_DB_NAME')); putenv('RDS_DB_NAME=');
+$container->setParameter('mautic.db_user', getenv('RDS_USERNAME')); putenv('RDS_USERNAME=');
+$container->setParameter('mautic.db_password', getenv('RDS_PASSWORD')); putenv('RDS_PASSWORD=');
 $container->setParameter('mautic.site_url', getenv('APP_URL').'/'.PULL);
-putenv('APP_URL=');
 $container->setParameter(
     'mautic.security.restrictedConfigFields',
     array_merge(

@@ -1,37 +1,13 @@
 #!/usr/bin/env bash
 # Build a PR directory as needed.
 
-# Caveats:
-#    Temporary - Test environments will be disbanded when not in use, and will be re-built if the PR changes.
-#    Public - Test environments are public, shared and by that nature, insecure. Do not store private information here.
-#    Email - Emails can not be sent from the environment, but you can view them as if they were.
-
-# Paths:
-#    /code/pulls                Pull requests
-#    /code/pulls/xxxx           Pull request
-#    /code/pulls/xxxx/.patches/ Patches applied to the build.
-#    /code/stage                Working copy of the core repo with permissions applied for faster local cloning.
-#
-#    /www/data/xxxx/statis.json Current status of the PR in question.
-#    /www/data/xxxx/*.log       Aggregated logs for the PR.
-#    /www/index.php             Home page where you select PRs.
-#    /www/
-#    /www/xxxx                  Symlink to /code/prs/xxxx when ready.
-#                               Internal redirect to /www/status when not present.
-
-# Routes:
-#    /                          Home page, PR selection, links.
-#    /xxxx                      PR number, either status screen or symlink to /code/prs/xxxx
-#    /xxxx/data                 Status/logs stream.
-#    /xxxx/mail                 Mailhog interface.
-
 # set -e
 
 # Prep:
 # composer global require hirak/prestissimo
 
-FREQUENCY=1
 BASEDIR=$(dirname "$BASH_SOURCE")
+cd $BASEDIR/../
 BASEDIR=$( pwd )
 REPO="https://github.com/mautic/mautic"
 PULLNO="$1"
@@ -54,6 +30,11 @@ then
     exit 1
 fi
 
+if [ -z "$FREQUENCY" ]
+then
+    FREQUENCY=5
+fi
+
 function console {
     if [ -f "/opt/elasticbeanstalk/support/envvars" ]
     then
@@ -65,7 +46,7 @@ function console {
 
 function status {
     echo "New status: $1"
-    echo "{'sha':'$SHA','date':'$DATE','pull':$PULLNO,'status':'$1'}" > "$DATA/status.json"
+    echo '{"sha":"'$SHA'","date":"'$DATE'","pull":'$PULLNO',"status":"'$1'"}' > "$DATA/status.json"
 }
 
 if [ ! -z $( find "$PATCH" -mmin -$FREQUENCY 2>/dev/null ) ]
@@ -200,11 +181,11 @@ else
     rm -rf "/tmp/$1" "$PULL/app/cache/*"
     mkdir -p "/tmp/$1"
 
-#    echo "Building/updating database"
-#    cd "$PULL"
-#    console doctrine:database:create --no-interaction --if-not-exists
-#    console mautic:install:data -n -vvv
-#    console doctrine:migrations:version --add --all --no-interaction -vvv
+    echo "Building/updating database"
+    cd "$PULL"
+    console doctrine:database:create --no-interaction --if-not-exists
+    console mautic:install:data -n -vvv
+    console doctrine:migrations:version --add --all --no-interaction -vvv
 
     cd "$PULL"
     SHA=$( git rev-parse --short HEAD )
