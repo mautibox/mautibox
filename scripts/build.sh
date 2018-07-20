@@ -32,7 +32,7 @@ fi
 
 if [ -z "$FREQUENCY" ]
 then
-    FREQUENCY=5
+    FREQUENCY=1
 fi
 
 function console {
@@ -49,15 +49,56 @@ function status {
     echo '{"sha":"'$SHA'","date":"'$DATE'","pull":'$PULLNO',"status":"'$1'"}' > "$DATA/status.json"
 }
 
+function permissions {
+    echo "Correcting permissions"
+    touch app/config/local.php
+    mkdir -p app/cache \
+        app/logs \
+        app/spool \
+        media/files \
+        translations
+    chown -R webapp:webapp .
+    chgrp -R webapp . \
+        app/bootstrap.php.cache \
+        media \
+        app/cache \
+        app/logs
+    chmod -R u+rwX,go+rX,go-w .
+    chmod -R ug+wx app/bootstrap.php.cache \
+        app/config/local.php \
+        media \
+        app/cache \
+        app/logs
+}
+
+function dependencies {
+    "Running composer"
+    composer install --no-scripts --no-progress --no-suggest
+}
+
+function overrides {
+    echo "Syncing overrides"
+    rsync -avh --update "$OVERRIDES/" "$PULL"
+}
+
+function cacheclear {
+    echo "Clearing tmp and cache"
+    if [ -d "/tmp/$1" ]
+    then
+        rm -rf "/tmp/$1/*"
+    else
+        mkdir -p "/tmp/$1"
+    fi
+    if [ -d "$PULL/app/cache" ]
+    then
+        rm -rf "$PULL/app/cache/*"
+    fi
+}
+
 if [ ! -z $( find "$PATCH" -mmin -$FREQUENCY 2>/dev/null ) ]
 then
     echo "The PULL is recent enough. Builds permitted every $FREQUENCY minutes."
 else
-    if [ ! -d "$PULL" ]
-    then
-        status 'building'
-    fi
-
     # Prep data folder.
     if [ ! -d "$DATA" ]
     then
@@ -65,6 +106,13 @@ else
         chown -R webapp:webapp "$DATA"
         chgrp -R webapp "$DATA"
         chmod -R ug+wx "$DATA"
+    fi
+
+    #  Prep pull folder and build status.
+    if [ ! -d "$PULL" ]
+    then
+        mkdir -p "$PULL"
+        status 'building'
     fi
 
     # Create/update stage as needed.
@@ -83,33 +131,12 @@ else
             cd "$STAGE"
             SHA=$( git rev-parse --short HEAD )
         fi
-        git clean -fd
-        git reset --hard HEAD
         git pull
+        touch app/bootstrap.php.cache
         NEWSHA=$( git rev-parse --short HEAD )
         if [ "$NEWSHA" != "$SHA" ]
         then
-            # Git repository changes detected
-            composer install --no-scripts --no-progress --no-suggest
-            touch app/bootstrap.php.cache \
-                app/config/local.php
-            mkdir -p app/cache \
-                app/logs \
-                app/spool \
-                media/files \
-                translations
-            chown -R webapp:webapp .
-            chgrp -R webapp . \
-                app/bootstrap.php.cache \
-                media \
-                app/cache \
-                app/logs
-            chmod -R u+rwX,go+rX,go-w .
-            chmod -R ug+wx app/bootstrap.php.cache \
-                app/config/local.php \
-                media \
-                app/cache \
-                app/logs
+            dependencies
         fi
     fi
 
@@ -122,7 +149,6 @@ else
     if [ "$NEWSHA" != "$SHA" ]
     then
         echo "Syncing pull request workspace"
-        mkdir -p "$PULL"
         rsync -aLrqW --delete --force "$STAGE/" "$PULL"
         if [ $? -ne 0 ]
         then
@@ -134,11 +160,19 @@ else
     fi
 
     # Check if a patch is needed or has already been applied.
-    NEWPATCH=$( curl -sL "$REPO/pull/$1.patch" )
+    mkdir -p "$PATCHDIR"
+    curl -sfL "$REPO/pull/$1.patch" --output "$PATCH.new"
+    if [ $? -ne 0 ]
+    then
+        status 'error'
+        echo "Patch could not be downloaded."
+        exit 1
+    fi
+    NEWPATCH=$( cat "$PATCH.new" )
     if [ -z "$NEWPATCH" ]
     then
         status 'error'
-        echo "Patch diff is empty"
+        echo "Patch is empty."
         exit 1
     fi
     if [ -f "$PATCH" ]
@@ -147,16 +181,16 @@ else
     fi
     if [ "$OLDPATCH" != "$NEWPATCH" ]
     then
+        cp "$PATCH.new" "$PATCH"
+        rm -f "$PATCH.new"
         cd "$PULL"
-        echo "$NEWPATCH" | git apply -v
+        git apply --whitespace=nowarn --verbose "$PATCH"
         if [ $? -ne 0 ]
         then
             status 'error'
-            echo "Failed patch!"
+            echo "Patch could not be applied cleanly."
             exit 1
         fi
-        mkdir -p "$PATCHDIR"
-        echo "$NEWPATCH" > "$PATCH"
         CHANGES=1
     fi
 
@@ -167,19 +201,19 @@ else
         exit
     fi
 
-    if [[ "$NEWPATCH" = *"composer."* ]]
+    # Check for dependency changes.
+    if cmp "$STAGE/composer.lock" "$PULL/composer.lock"
     then
-        echo "Possible composer changes detected"
         cd "$PULL"
-        composer install --no-scripts --no-progress --no-suggest
+        echo "Possible dependency changes detected"
+        dependencies
     fi
 
-    echo "Syncing overrides"
-    rsync -avh --update "$OVERRIDES/" "$PULL"
+    overrides
 
-    echo "Clearing cache and tmp"
-    rm -rf "/tmp/$1" "$PULL/app/cache/*"
-    mkdir -p "/tmp/$1"
+    cacheclear
+
+    permissions
 
     echo "Building/updating database"
     cd "$PULL"
