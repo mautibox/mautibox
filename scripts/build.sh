@@ -72,7 +72,7 @@ function permissions {
 }
 
 function dependencies {
-    "Running composer"
+    echo "Running composer"
     composer install --no-scripts --no-progress --no-suggest
 }
 
@@ -198,8 +198,10 @@ else
     if [ "$CHANGES" -ne 1 ]
     then
         echo "Existing environment is up to date."
-        exit
+        exit 0
     fi
+
+    # Check for css/js changes
 
     # Check for dependency changes.
     if cmp "$STAGE/composer.lock" "$PULL/composer.lock"

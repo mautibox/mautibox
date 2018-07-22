@@ -2,6 +2,7 @@
 /**
  * Mautibox security overrides.
  */
+$loader->import('security.php');
 $container->setParameter('mautic.security.disableUpdates', true);
 $container->setParameter(
     'mautic.security.restrictedConfigFields',
@@ -16,3 +17,4 @@ $container->setParameter(
         ]
     )
 );
+$container->setParameter('mautic.security.restrictedConfigFields.displayMode', \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::MODE_MASK);

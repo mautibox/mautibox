@@ -21,7 +21,7 @@ $container->loadFromExtension(
 $container->loadFromExtension(
     'swiftmailer',
     [
-        'disable_delivery' => true,
+        'disable_delivery' => false,
     ]
 );
 // Log notices and above, with full traces and output to *.log files for a week.
