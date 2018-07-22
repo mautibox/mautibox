@@ -1,4 +1,5 @@
 .*
+!.ebextensions
 code
 mail
 logs
