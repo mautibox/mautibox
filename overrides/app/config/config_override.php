@@ -2,28 +2,28 @@
 /**
  * Mautibox config overrides to behave like dev/test at all times.
  */
-$container->setParameter('kernel.debug', true);
-$container->loadFromExtension(
-    'framework',
-    [
-        'profiler' => [
-            'collect' => true,
-        ],
-    ]
-);
-$container->loadFromExtension(
-    'web_profiler',
-    [
-        'toolbar'             => true,
-        'intercept_redirects' => false,
-    ]
-);
-$container->loadFromExtension(
-    'swiftmailer',
-    [
-        'disable_delivery' => false,
-    ]
-);
+// $container->setParameter('kernel.debug', true);
+// $container->loadFromExtension(
+//     'framework',
+//     [
+//         'profiler' => [
+//             'collect' => true,
+//         ],
+//     ]
+// );
+// $container->loadFromExtension(
+//     'web_profiler',
+//     [
+//         'toolbar'             => true,
+//         'intercept_redirects' => false,
+//     ]
+// );
+// $container->loadFromExtension(
+//     'swiftmailer',
+//     [
+//         'disable_delivery' => false,
+//     ]
+// );
 // Log notices and above, with full traces and output to *.log files for a week.
 $container->loadFromExtension('monolog', [
     'channels' => [
