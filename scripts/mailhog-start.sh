@@ -25,8 +25,7 @@ sudo chmod +x /usr/local/bin/mailhog
 # sudo ln /work/bin/mhsendmail /usr/local/bin/mail
 
 # Enable and run the Mailhog daemon.
-systemctl enable mailhog.service
-systemctl start mailhog.service
+sudo /sbin/service mailhog restart
 
 # Gracefully reload apache configuration.
 sudo /etc/init.d/httpd graceful
