@@ -29,3 +29,5 @@ sudo chmod +x /usr/local/bin/mailhog
 
 # Gracefully reload apache configuration.
 sudo /etc/init.d/httpd graceful
+
+# @todo - We must filter ws -> wss for the /mail path so that we're compatible with mailhog 1.0.0 over ssl
