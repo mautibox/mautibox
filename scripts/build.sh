@@ -14,7 +14,7 @@ PULLNO="$1"
 STAGE="$BASEDIR/code/stage"
 DATA="$BASEDIR/code/data/$PULLNO"
 PULL="$BASEDIR/code/pulls/$PULLNO"
-WEB="$BASEDIR/web/$PULLNO/"
+WEB="$BASEDIR/web"
 PATCHDIR="$BASEDIR/code/pulls/$PULLNO/.patches"
 PATCH="$BASEDIR/code/pulls/$PULLNO/.patches/$PULLNO.patch"
 OVERRIDES="$BASEDIR/overrides"
@@ -102,39 +102,41 @@ function cachewarm {
 }
 
 function link {
+    cd "$WEB"
     echo "Creating web symlink"
-    if [ -L "$PULL" ]
+    if [ -L "$PULLNO" ]
     then
-        if [ -e "$PULL" ]
+        if [ -e "$PULLNO" ]
         then
             echo "Good link"
         else
             echo "Broken link"
-            ln -s "$PULL" "$WEB"
+            ln -s "$PULL" "$PULLNO"
         fi
-    elif [ -e "$PULL" ]
+    elif [ -e "$PULLNO" ]
     then
         echo "Not a link"
-        ln -s "$PULL" "$WEB"
+        ln -s "$PULL" "$PULLNO"
     else
         echo "Missing"
-        ln -s "$PULL" "$WEB"
+        ln -s "$PULL" "$PULLNO"
     fi
 }
 
 function unlink {
+    cd "$WEB"
     echo "Removing web symlink"
-    if [ -L "$PULL" ]
+    if [ -L "$PULLNO" ]
     then
-        if [ -e "$PULL" ]
+        if [ -e "$PULLNO" ]
         then
             echo "Good link"
-            rm "$WEB"
+            rm "$PULLNO"
         else
             echo "Broken link"
-            rm "$WEB"
+            rm "$PULLNO"
         fi
-    elif [ -e "$PULL" ]
+    elif [ -e "$PULLNO" ]
     then
         echo "Not a link"
     else
