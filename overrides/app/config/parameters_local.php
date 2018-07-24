@@ -14,7 +14,6 @@ $parameters = [
     'db_table_prefix'       => PULL.'_',
     'db_host'               => getenv('RDS_HOSTNAME') ?: 'localhost',
     'db_port'               => getenv('RDS_PORT') ?: '3306',
-    // 'db_name'               => getenv('RDS_DB_NAME') ?: 'mautic_'.PULL,
     'db_name'               => 'mautic_'.PULL,
     'db_user'               => getenv('RDS_USERNAME') ?: 'root',
     'db_password'           => getenv('RDS_PASSWORD') ?: 'root',
@@ -35,9 +34,3 @@ $parameters = [
     'log_path'              => realpath(MAUTIC_ROOT_DIR.'/../../data/'.PULL),
     'tmp_path'              => '/tmp/'.PULL,
 ];
-// putenv('RDS_HOSTNAME=');
-// putenv('RDS_PORT=');
-// putenv('RDS_DB_NAME=');
-// putenv('RDS_USERNAME=');
-// putenv('RDS_HOSTNAME=');
-// putenv('RDS_PASSWORD=');

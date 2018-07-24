@@ -276,6 +276,7 @@ else
     then
         status 'error'
         echo "Could not install DB."
+        echo "$DBCREATE"
         exit 1
     fi
     echo "$DBCREATE"
