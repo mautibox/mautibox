@@ -14,6 +14,7 @@ PULLNO="$1"
 STAGE="$BASEDIR/code/stage"
 DATA="$BASEDIR/code/data/$PULLNO"
 PULL="$BASEDIR/code/pulls/$PULLNO"
+WEB="$BASEDIR/web/$PULLNO/"
 PATCHDIR="$BASEDIR/code/pulls/$PULLNO/.patches"
 PATCH="$BASEDIR/code/pulls/$PULLNO/.patches/$PULLNO.patch"
 OVERRIDES="$BASEDIR/overrides"
@@ -95,6 +96,47 @@ function cacheclear {
     fi
 }
 
+function link {
+    echo "Creating web symlink"
+    if [ -L "$PULL" ]
+    then
+        if [ -e "$PULL" ]
+        then
+            echo "Good link"
+        else
+            echo "Broken link"
+            ln -s "$PULL" "$WEB"
+        fi
+    elif [ -e "$PULL" ]
+    then
+        echo "Not a link"
+        ln -s "$PULL" "$WEB"
+    else
+        echo "Missing"
+        ln -s "$PULL" "$WEB"
+    fi
+}
+
+function unlink {
+    echo "Removing web symlink"
+    if [ -L "$PULL" ]
+    then
+        if [ -e "$PULL" ]
+        then
+            echo "Good link"
+            rm "$WEB"
+        else
+            echo "Broken link"
+            rm "$WEB"
+        fi
+    elif [ -e "$PULL" ]
+    then
+        echo "Not a link"
+    else
+        echo "Missing"
+    fi
+}
+
 if [ ! -z $( find "$PATCH" -mmin -$FREQUENCY 2>/dev/null ) ]
 then
     echo "The PULL is recent enough. Builds permitted every $FREQUENCY minutes."
@@ -113,6 +155,7 @@ else
     then
         mkdir -p "$PULL"
         status 'building'
+        unlink
     fi
 
     # Create/update stage as needed.
@@ -157,6 +200,7 @@ else
             exit 1
         fi
         CHANGES=1
+        unlink
     fi
 
     # Check if a patch is needed or has already been applied.
@@ -192,6 +236,7 @@ else
             exit 1
         fi
         CHANGES=1
+        unlink
     fi
 
     # If there were no changes, end.
@@ -219,12 +264,35 @@ else
 
     echo "Building/updating database"
     cd "$PULL"
-    console doctrine:database:create --no-interaction --if-not-exists
-    console mautic:install:data -n -vvv
-    console doctrine:migrations:version --add --all --no-interaction -vvv
+    DBCREATE=$( console doctrine:database:create --no-interaction --if-not-exists )
+    if [ $? -ne 0 ]
+    then
+        status 'error'
+        echo "Could not install DB."
+        exit 1
+    fi
+    echo "$DBCREATE"
+    if [[ $DBCREATE == *"Skipped."* ]]
+    then
+        echo "DB Already exists, running migrations and forcing schema updates."
+        console doctrine:migrations:migrate --no-interaction
+        console doctrine:schema:update --force
+    else
+        echo "Fresh DB, installing default data and migrations."
+        console mautic:install:data --force
+        console doctrine:migrations:version --add --all --no-interaction
+    fi
+    if [ $? -ne 0 ]
+    then
+        status 'error'
+        echo "Error prepping DB."
+        exit 1
+    fi
 
     cd "$PULL"
     SHA=$( git rev-parse --short HEAD )
     DATE=$( git log -1 --format=%cd )
     status 'ready'
+
+    link
 fi
