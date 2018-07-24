@@ -96,6 +96,11 @@ function cacheclear {
     fi
 }
 
+function cachewarm {
+    echo "Warming up mandatory caches"
+    console cache:warmup --no-optional-warmers
+}
+
 function link {
     echo "Creating web symlink"
     if [ -L "$PULL" ]
@@ -275,6 +280,7 @@ else
     if [[ $DBCREATE == *"Skipped."* ]]
     then
         echo "DB Already exists, running migrations and forcing schema updates."
+        # @todo - slipstream from a periodic staging mysqldump for even faster deployment here.
         console doctrine:migrations:migrate --no-interaction
         console doctrine:schema:update --force
     else
@@ -289,10 +295,12 @@ else
         exit 1
     fi
 
+    link
+
+    cachewarm
+
     cd "$PULL"
     SHA=$( git rev-parse --short HEAD )
     DATE=$( git log -1 --format=%cd )
     status 'ready'
-
-    link
 fi
