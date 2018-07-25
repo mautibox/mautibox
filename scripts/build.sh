@@ -41,17 +41,17 @@ function console {
     then
         sudo -u webapp bash -c ". /opt/elasticbeanstalk/support/envvars ; /usr/bin/php app/console $@"
     else
-        php app/console $@
+        php ./app/console $@
     fi
 }
 
 function status {
-    echo "New status: $1"
+    echo "Status: $1"
     echo '{"sha":"'$SHA'","date":"'$DATE'","pull":'$PULLNO',"status":"'$1'"}' > "$DATA/status.json"
 }
 
 function permissions {
-    echo "Correcting permissions"
+    echo "Enforcing permissions"
     touch app/config/local.php
     mkdir -p app/cache \
         app/logs \
@@ -78,8 +78,13 @@ function dependencies {
 }
 
 function overrides {
-    echo "Syncing overrides"
+    echo "Setting parameters"
     rsync -avh --update "$OVERRIDES/" "$PULL"
+    echo "Prepping log space"
+    touch "$DATA/apache.access.log"
+    touch "$DATA/apache.error.log"
+    touch "$DATA/php.error.log"
+    dataprep
 }
 
 function cacheclear {
@@ -97,50 +102,54 @@ function cacheclear {
 }
 
 function cachewarm {
+    cd "$PULL"
     echo "Warming up mandatory caches"
     console cache:warmup --no-optional-warmers
 }
 
 function link {
     cd "$WEB"
-    echo "Creating web symlink"
     if [ -L "$PULLNO" ]
     then
         if [ -e "$PULLNO" ]
         then
-            echo "Good link"
+            echo "Link already exists."
         else
-            echo "Broken link"
+            echo "Creating symlink."
             ln -s "$PULL" "$PULLNO"
         fi
     elif [ -e "$PULLNO" ]
     then
-        echo "Not a link"
+        echo "Creating symlink."
         ln -s "$PULL" "$PULLNO"
     else
-        echo "Missing"
+        echo "Creating symlink."
         ln -s "$PULL" "$PULLNO"
     fi
 }
 
 function unlink {
     cd "$WEB"
-    echo "Removing web symlink"
     if [ -L "$PULLNO" ]
     then
         if [ -e "$PULLNO" ]
         then
-            echo "Good link"
+            echo "Removing link."
             rm "$PULLNO"
         else
-            echo "Broken link"
+            echo "Removing link."
             rm "$PULLNO"
         fi
-    elif [ -e "$PULLNO" ]
+    fi
+}
+
+function dataprep {
+    if [ ! -d "$DATA" ]
     then
-        echo "Not a link"
-    else
-        echo "Missing"
+        mkdir -p "$DATA"
+        chown -R webapp:webapp "$DATA"
+        chgrp -R webapp "$DATA"
+        chmod -R ug+wx "$DATA"
     fi
 }
 
@@ -149,13 +158,7 @@ then
     echo "The PULL is recent enough. Builds permitted every $FREQUENCY minutes."
 else
     # Prep data folder.
-    if [ ! -d "$DATA" ]
-    then
-        mkdir -p "$DATA"
-        chown -R webapp:webapp "$DATA"
-        chgrp -R webapp "$DATA"
-        chmod -R ug+wx "$DATA"
-    fi
+    dataprep
 
     #  Prep pull folder and build status.
     if [ ! -d "$PULL" ]
@@ -168,11 +171,11 @@ else
     # Create/update stage as needed.
     if [ ! -z $( find "$STAGE/app/bootstrap.php.cache" -mmin -$FREQUENCY 2>/dev/null ) ]
     then
-        echo "Staging working copy is recent enough. Builds permitted every $FREQUENCY minutes."
+        echo "Stage is recent enough. Updates every $FREQUENCY minutes."
         cd "$STAGE"
         NEWSHA=$( git rev-parse --short HEAD )
     else
-        echo "Refreshing stage"
+        echo "Refreshing stage copy"
         if [ ! -d "$STAGE" ]
         then
             git clone -b staging --single-branch --depth 1 $REPO.git "$STAGE"
@@ -212,14 +215,14 @@ else
 
     # Check if a patch is needed or has already been applied.
     mkdir -p "$PATCHDIR"
-    curl -sfL "$REPO/pull/$1.patch" --output "$PATCH.new"
+    curl -sfL "$REPO/pull/$1.patch" --output "$PATCH.latest"
     if [ $? -ne 0 ]
     then
         status 'error'
         echo "Patch could not be downloaded."
         exit 1
     fi
-    NEWPATCH=$( cat "$PATCH.new" )
+    NEWPATCH=$( cat "$PATCH.latest" )
     if [ -z "$NEWPATCH" ]
     then
         status 'error'
@@ -232,8 +235,8 @@ else
     fi
     if [ "$OLDPATCH" != "$NEWPATCH" ]
     then
-        cp "$PATCH.new" "$PATCH"
-        rm -f "$PATCH.new"
+        cp "$PATCH.latest" "$PATCH"
+        rm -f "$PATCH.latest"
         cd "$PULL"
         git apply --whitespace=nowarn --verbose "$PATCH"
         if [ $? -ne 0 ]
@@ -244,12 +247,14 @@ else
         fi
         CHANGES=1
         unlink
+    else
+        rm -f "$PATCH.latest"
     fi
 
     # If there were no changes, end.
     if [ "$CHANGES" -ne 1 ]
     then
-        echo "Existing environment is up to date."
+        echo "Environment is up to date."
         exit 0
     fi
 

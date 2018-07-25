@@ -6,11 +6,11 @@ if (!defined('PULL')) {
     define('PULL', basename(realpath(MAUTIC_ROOT_DIR)));
 }
 $parameters = [
-    'db_driver'             => 'pdo_mysql',
     'api_enabled'           => true,
     'api_enable_basic_auth' => true,
     'debug'                 => true,
     'rss_notification_url'  => null,
+    'db_driver'             => 'pdo_mysql',
     'db_table_prefix'       => PULL.'_',
     'db_host'               => getenv('RDS_HOSTNAME') ?: 'localhost',
     'db_port'               => getenv('RDS_PORT') ?: '3306',

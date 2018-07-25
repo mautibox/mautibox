@@ -2,6 +2,10 @@
 /**
  * Mautibox config overrides to behave like dev/test at all times.
  */
+if (!defined('PULL')) {
+    define('PULL', basename(realpath(MAUTIC_ROOT_DIR)));
+}
+$container->setParameter('kernel.logs_dir', realpath(MAUTIC_ROOT_DIR.'/../../data/'.PULL));
 // $container->setParameter('kernel.debug', true);
 // $container->loadFromExtension(
 //     'framework',
@@ -42,14 +46,14 @@ $container->loadFromExtension('monolog', [
         ],
         'nested' => [
             'type'      => 'rotating_file',
-            'path'      => '%kernel.logs_dir%/%kernel.environment%.log',
+            'path'      => '%mautic.log_path%/%kernel.environment%.log',
             'level'     => 'notice',
             'max_files' => 7,
         ],
         'mautic' => [
             'formatter' => 'mautic.monolog.fulltrace.formatter',
             'type'      => 'rotating_file',
-            'path'      => '%kernel.logs_dir%/mautic_%kernel.environment%.log',
+            'path'      => '%mautic.log_path%/mautic_%kernel.environment%.log',
             'level'     => 'notice',
             'channels'  => [
                 'mautic',
