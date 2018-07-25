@@ -84,6 +84,7 @@ function overrides {
     touch "$DATA/apache.access.log"
     touch "$DATA/apache.error.log"
     touch "$DATA/php.error.log"
+    echo "SetEnv PULL $PULLNO" >> "$PULL/.htaccess"
     dataprep
 }
 
