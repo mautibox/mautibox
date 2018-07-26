@@ -5,6 +5,7 @@ Public sandbox for testing [Mautic](https://github.com/mautic/mautic)
 ## Elastic Beanstalk Environment Variables
 
     APP_URL             - URL for Mautibox.
+    GH_TOKEN            - Read-only public github user token.
     FREQUENCY           - Frequency of build updates (default 5min).         
     RDS_HOSTNAME        - Set by EB.
     RDS_PORT            - Set by EB.

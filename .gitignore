@@ -1,9 +1,7 @@
 .*
 !.ebextensions
 code
-mail
-logs
-home
+vendor
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
