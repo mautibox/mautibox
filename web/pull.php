@@ -18,20 +18,45 @@ $client->addCache($pool, ['default_ttl' => $ttl]);
 $client->authenticate(getenv('GH_TOKEN'), null, Github\Client::AUTH_HTTP_TOKEN);
 
 // Get all open PRs sorted by popularity.
-$repoApi    = $client->api('pullRequest');
+$repoApi = $client->api('pullRequest');
 try {
-    $pull       = $pager->fetch($repoApi, 'show', ['mautic', 'mautic', $pullNumber]);
+    $pull = $pager->fetch($repoApi, 'show', ['mautic', 'mautic', $pullNumber]);
 } catch (\Exception $exception) {
-    die('Pull request is not valid. Github says "' .$exception->getMessage() . '"');
+    throwError('Pull request is not valid. Github says "'.$exception->getMessage().'"');
 }
 if ($pull['merged'] == true) {
-    die('This pull request is already merged!');
+    throwError('This pull request is already merged!');
 }
 if ($pull['state'] !== 'open') {
-    die('Pull request must be open to test.');
+    throwError('Pull request must be open to test.');
 }
 if ($pull['mergeable'] == false) {
-    die('This pull request cannot be merged, and as such a patch will not work. Conflicts must be resolved first!');
+    throwError('This pull request cannot be merged. Conflicts must be resolved and tests must pass first.');
 }
-header('Content-Type: application/json');
-echo json_encode($pull);
+
+// @todo - Start a build/update process (auto de-duping).
+
+// @todo - Get the build status and merge it with the PR output.
+
+// The pull is valid, and mergable, see if we're already building it, and return status.
+
+// An arbitrary "size" of this pull request for visualization.
+// $size = $pull['comments'] + $pull['review_comments'] + $pull['commits'] + $pull['additions'] + $pull['deletions'] + $pull['changed_files'];
+
+function throwError($message)
+{
+    outputResult(
+        [
+            'error' => $message,
+            'pull'  => [],
+            'build' => [],
+        ]
+    );
+}
+
+function outputResult($array)
+{
+    header('Content-Type: application/json');
+    echo json_encode($array);
+    exit;
+}

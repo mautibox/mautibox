@@ -38,5 +38,15 @@ if (!$simplified) {
     }
     $pool->set($key, $simplified, $ttl);
 }
-header('Content-Type: application/json');
-echo json_encode($simplified);
+
+outputResult([
+    'error' => null,
+    'pulls' => $simplified,
+]);
+
+function outputResult($array)
+{
+    header('Content-Type: application/json');
+    echo json_encode($array);
+    exit;
+}

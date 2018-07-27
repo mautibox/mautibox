@@ -1,10 +1,41 @@
 #!/usr/bin/env bash
 # Build a PR directory as needed.
+#
+# To run via php: exec('/usr/bin/nohup /bin/bash /var/app/current/build.sh #### >/dev/null 2>&1 &');
 
-# set -e
-
-# Prep:
-# composer global require hirak/prestissimo
+if [ -z $( which ps ) ]
+then
+    echo "ps is required to run this script."
+    exit 1
+fi
+if [ -z $( which grep ) ]
+then
+    echo "grep is required to run this script."
+    exit 1
+fi
+if [ -z $( which nohup ) ]
+then
+    echo "nohup is required to run this script."
+    exit 1
+fi
+if [ -z "$1" ]
+then
+    echo "Please provide a pull request number"
+    exit 1
+fi
+if [ $( ps aux --no-headers 2>&1 | grep -c "$0 $@" 2>&1 ) -gt 1 ]
+then
+    echo "Already running."
+    exit 0
+fi
+if [ -f "/opt/elasticbeanstalk/support/envvars" ]
+then
+    . /opt/elasticbeanstalk/support/envvars
+fi
+if [ -z "$FREQUENCY" ]
+then
+    FREQUENCY=1
+fi
 
 BASEDIR=$(dirname "$BASH_SOURCE")
 cd $BASEDIR/../
@@ -24,17 +55,6 @@ NEWSHA=""
 OLDPATCH=""
 NEWPATCH=""
 CHANGES=0
-
-if [ -z "$1" ]
-then
-    echo "Please provide a pull request number"
-    exit 1
-fi
-
-if [ -z "$FREQUENCY" ]
-then
-    FREQUENCY=1
-fi
 
 function console {
     if [ -f "/opt/elasticbeanstalk/support/envvars" ]
