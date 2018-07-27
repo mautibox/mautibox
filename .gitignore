@@ -1,7 +1,10 @@
 .*
+!.htaccess
+!.gitignore
 !.ebextensions
 code
 vendor
+web/*/
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
