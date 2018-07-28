@@ -3,6 +3,7 @@
 !.gitignore
 !.ebextensions
 code
+queue
 vendor
 web/*/
 # Elastic Beanstalk Files

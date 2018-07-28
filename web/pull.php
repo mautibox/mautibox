@@ -36,21 +36,14 @@ if ($pull['mergeable'] == false) {
     throwError('This pull request cannot be merged. Conflicts must be resolved and tests must pass first.');
 }
 
+# Add this pull to the queue to be checked/updated/installed
 define('BASE', realpath(__DIR__.'/../'));
-if (!is_dir(BASE.'/code')) {
-    mkdir(BASE.'/code');
+$filename = BASE . '/queue/'.$pullNumber.'.pull';
+if (!is_file($filename)) {
+    file_put_contents(BASE . '/queue/'.$pullNumber.'.pull', time());
 }
-if (!is_dir(BASE.'/code/data')) {
-    mkdir(BASE.'/code/data');
-}
-if (!is_dir(BASE.'/code/data/'.$pullNumber)) {
-    mkdir(BASE.'/code/data/'.$pullNumber);
-}
-$command = 'nohup bash '.BASE.'/scripts/build.sh '.$pullNumber.' >>'.BASE.'/code/data/'.$pullNumber.'/build.log 2>&1 &';
-exec($command);
-// @todo - Start a build/update process (auto de-duping).
 
-// @todo - Get the build status and merge it with the PR output.
+// @todo - Get the build status (if available) and merge it with the PR output.
 
 // The pull is valid, and mergable, see if we're already building it, and return status.
 
