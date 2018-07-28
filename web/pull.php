@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL);
+
 require_once __DIR__.'/../vendor/autoload.php';
 
 $urlParts   = explode('/', ltrim($_SERVER['REQUEST_URI'], '/'));
@@ -34,6 +36,18 @@ if ($pull['mergeable'] == false) {
     throwError('This pull request cannot be merged. Conflicts must be resolved and tests must pass first.');
 }
 
+define('BASE', realpath(__DIR__.'/../'));
+if (!is_dir(BASE.'/code')) {
+    mkdir(BASE.'/code');
+}
+if (!is_dir(BASE.'/code/data')) {
+    mkdir(BASE.'/code/data');
+}
+if (!is_dir(BASE.'/code/data/'.$pullNumber)) {
+    mkdir(BASE.'/code/data/'.$pullNumber);
+}
+$command = 'nohup bash '.BASE.'/scripts/build.sh '.$pullNumber.' >>'.BASE.'/code/data/'.$pullNumber.'/build.log 2>&1 &';
+exec($command);
 // @todo - Start a build/update process (auto de-duping).
 
 // @todo - Get the build status and merge it with the PR output.
@@ -42,6 +56,14 @@ if ($pull['mergeable'] == false) {
 
 // An arbitrary "size" of this pull request for visualization.
 // $size = $pull['comments'] + $pull['review_comments'] + $pull['commits'] + $pull['additions'] + $pull['deletions'] + $pull['changed_files'];
+
+outputResult(
+    [
+        'error' => null,
+        'pull'  => $pull,
+        'build' => [],
+    ]
+);
 
 function throwError($message)
 {
@@ -56,6 +78,7 @@ function throwError($message)
 
 function outputResult($array)
 {
+    header("HTTP/1.1 200 OK");
     header('Content-Type: application/json');
     echo json_encode($array);
     exit;

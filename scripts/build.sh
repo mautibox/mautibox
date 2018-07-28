@@ -2,7 +2,7 @@
 # Build a PR directory as needed.
 #
 # To run via php: exec('/usr/bin/nohup /bin/bash /var/app/current/build.sh #### >/dev/null 2>&1 &');
-
+which ps
 if [ -z $( which ps ) ]
 then
     echo "ps is required to run this script."
@@ -36,6 +36,10 @@ if [ -z "$FREQUENCY" ]
 then
     FREQUENCY=1
 fi
+
+echo -ne '\007'
+echo 'edon'
+exit
 
 BASEDIR=$(dirname "$BASH_SOURCE")
 cd $BASEDIR/../
