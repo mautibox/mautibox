@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 # Build a PR directory as needed.
-#
-# To run via php: exec('/usr/bin/nohup /bin/bash /var/app/current/build.sh #### >/dev/null 2>&1 &');
 
 if [ -z $( which ps ) ]
 then
@@ -11,11 +9,6 @@ fi
 if [ -z $( which grep ) ]
 then
     echo "grep is required to run this script."
-    exit 1
-fi
-if [ -z $( which nohup ) ]
-then
-    echo "nohup is required to run this script."
     exit 1
 fi
 if [ -z "$1" ]
@@ -41,6 +34,7 @@ BASEDIR=$(dirname "$BASH_SOURCE")
 cd $BASEDIR/../
 BASEDIR=$( pwd )
 REPO="https://github.com/mautic/mautic"
+USER="webapp"
 PULLNO="$1"
 STAGE="$BASEDIR/code/stage"
 DATA="$BASEDIR/code/data/$PULLNO"
@@ -59,14 +53,14 @@ CHANGES=0
 function console {
     if [ -f "/opt/elasticbeanstalk/support/envvars" ]
     then
-        sudo -u webapp bash -c ". /opt/elasticbeanstalk/support/envvars ; /usr/bin/php app/console $@"
+        sudo -u $USER bash -c ". /opt/elasticbeanstalk/support/envvars ; /usr/bin/php app/console $@"
     else
         php ./app/console $@
     fi
 }
 
 function status {
-    echo "Status: $1"
+    echo "Status of $PULLNO is now: $1"
     echo '{"sha":"'$SHA'","date":"'$DATE'","pull":'$PULLNO',"status":"'$1'"}' > "$DATA/status.json"
 }
 
@@ -78,8 +72,8 @@ function permissions {
         app/spool \
         media/files \
         translations
-    chown -R webapp:webapp .
-    chgrp -R webapp . \
+    chown -R $USER:$USER .
+    chgrp -R $USER . \
         app/bootstrap.php.cache \
         media \
         app/cache \
@@ -99,11 +93,11 @@ function dependencies {
 
 function overrides {
     echo "Setting parameters"
-    rsync -avh --update "$OVERRIDES/" "$PULL"
-    echo "Prepping log space"
-    touch "$DATA/apache.access.log"
-    touch "$DATA/apache.error.log"
-    touch "$DATA/php.error.log"
+    rsync -avhq --update "$OVERRIDES/" "$PULL"
+    # echo "Prepping log space"
+    # touch "$DATA/apache.access.log"
+    # touch "$DATA/apache.error.log"
+    # touch "$DATA/php.error.log"
     echo "SetEnv PULL $PULLNO" >> "$PULL/.htaccess"
     dataprep
 }
@@ -168,8 +162,8 @@ function dataprep {
     if [ ! -d "$DATA" ]
     then
         mkdir -p "$DATA"
-        chown -R webapp:webapp "$DATA"
-        chgrp -R webapp "$DATA"
+        chown -R $USER:$USER "$DATA"
+        chgrp -R $USER "$DATA"
         chmod -R ug+wx "$DATA"
     fi
 }

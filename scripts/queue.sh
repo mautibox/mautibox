@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# Build a PR directory as needed.
-#
-# To run via php: exec('/usr/bin/nohup /bin/bash /var/app/current/build.sh #### >/dev/null 2>&1 &');
+# Loop over waiting builds and run the build script for each.
 
 if [ -z $( which ps ) ]
 then
@@ -18,11 +16,6 @@ then
     echo "nohup is required to run this script."
     exit 1
 fi
-if [ -z "$1" ]
-then
-    echo "Please provide a pull request number"
-    exit 1
-fi
 if [ $( ps aux --no-headers 2>&1 | grep -c "$0 $@" 2>&1 ) -gt 1 ]
 then
     echo "Already running."
@@ -36,9 +29,36 @@ fi
 BASEDIR=$(dirname "$BASH_SOURCE")
 cd $BASEDIR/../
 BASEDIR=$( pwd )
+USER="webapp"
 
-# @todo - Loop looking for files in the queue folder by ####.pull
+function dataprep {
+    if [ ! -d "$DATA" ]
+    then
+        mkdir -p "$DATA"
+        chown -R $USER:$USER "$DATA"
+        chgrp -R $USER "$DATA"
+        chmod -R ug+wx "$DATA"
+    fi
+}
 
-# @todo - Delete the file, and spin a process for build.sh
+while true
+do
+    # Loop looking for files in the queue folder by ####.pull
+    for file in $BASEDIR/queue/*.pull
+    do
+        [ -e "$file" ] || continue
 
-# @todo - Sleep 1 second.
+        # Delete the file, and spin a process for build.sh
+        rm -f "$file"
+        file=$(basename -- "$file")
+        PULLNO="${file%.*}"
+        echo "Running build request for $PULLNO"
+
+        # Prep for output to a logfile.
+        DATA="$BASEDIR/code/data/$PULLNO"
+        dataprep
+
+        sudo nohup bash -c "$BASEDIR/scripts/build.sh $PULLNO | while IFS= read -r l; do echo \"[\$(date '+%Y-%m-%d %H:%M:%S')] \$l\"; done >> \"$DATA/build.log\"" >/dev/null 2>&1 &
+    done
+    sleep 1
+done
