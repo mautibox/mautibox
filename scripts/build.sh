@@ -16,9 +16,10 @@ then
     echo "Please provide a pull request number"
     exit 1
 fi
-if [ $( ps aux --no-headers 2>&1 | grep -c "$0 $@" 2>&1 ) -gt 3 ]
+count=$( ps aux --no-headers 2>&1 | grep -c "build.s[h] $1" 2>&1 )
+if [ "$count" -gt 1 ]
 then
-    echo "Already running build for $1."
+    echo "Already running build for $1 ($count)"
     exit 0
 fi
 if [ -f "/opt/elasticbeanstalk/support/envvars" ]
