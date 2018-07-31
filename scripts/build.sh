@@ -94,7 +94,7 @@ function dependencies {
 
 function overrides {
     echo "Setting parameters"
-    rsync -havIq "$OVERRIDES/" "$PULL"
+    sudo rsync -havIq "$OVERRIDES/" "$PULL"
     # echo "Prepping log space"
     # touch "$DATA/apache.access.log"
     # touch "$DATA/apache.error.log"
@@ -217,8 +217,8 @@ else
     fi
     if [ "$NEWSHA" != "$SHA" ]
     then
-        echo "Syncing pull request workspace"
-        rsync -aLrW --delete --force "$STAGE/" "$PULL"
+        echo "Syncing pull request workspace: rsync -aLrWq --delete --force $STAGE/ $PULL"
+        sudo rsync -aLrWq --delete --force $STAGE/ $PULL
         if [ $? -ne 0 ]
         then
             status 'error'
