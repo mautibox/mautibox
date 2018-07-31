@@ -3,6 +3,7 @@
 !.gitignore
 !.ebignore
 !.ebextensions
+!.ebextensions/*
 /code
 /queue/*
 !/queue/.gitkeep
