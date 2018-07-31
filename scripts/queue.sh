@@ -17,7 +17,7 @@ then
     exit 1
 fi
 count=$( ps aux --no-headers 2>&1 | grep -c "queue.s[h]" 2>&1 )
-if [ "$count" -gt 1 ]
+if [ "$count" -gt 3 ]
 then
     echo "Already running queue worker ($count)"
     exit 0
