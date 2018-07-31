@@ -3,10 +3,11 @@
 !.gitignore
 !.ebextensions
 /code
-/queue
+/queue/*
+!/queue/.gitkeep
 /vendor
 /web/*/
-!web/assets
+!/web/assets
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
