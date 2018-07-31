@@ -16,7 +16,7 @@ then
     echo "nohup is required to run this script."
     exit 1
 fi
-if [ $( ps aux --no-headers 2>&1 | grep -c "$0" 2>&1 ) -gt 1 ]
+if [ $( ps aux --no-headers 2>&1 | grep -c "$0" 2>&1 ) -gt 2 ]
 then
     echo "Already running queue worker."
     exit 0
