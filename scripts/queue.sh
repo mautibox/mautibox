@@ -18,7 +18,7 @@ then
 fi
 if [ $( ps aux --no-headers 2>&1 | grep -c "$0 $@" 2>&1 ) -gt 1 ]
 then
-    echo "Already running."
+    echo "Already running queue worker."
     exit 0
 fi
 if [ -f "/opt/elasticbeanstalk/support/envvars" ]
