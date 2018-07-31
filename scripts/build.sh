@@ -16,8 +16,8 @@ then
     echo "Please provide a pull request number"
     exit 1
 fi
-count=$( ps aux --no-headers 2>&1 | grep -c "build.s[h] $1" 2>&1 )
-if [ "$count" -gt 3 ]
+count=$( ps aux --no-headers 2>&1 | grep -c "bash /var/app/current/scripts/build.s[h] $1" 2>&1 )
+if [ "$count" -gt 2 ]
 then
     echo "Already running build for $1 ($count)"
     exit 0
@@ -218,7 +218,7 @@ else
     if [ "$NEWSHA" != "$SHA" ]
     then
         echo "Syncing pull request workspace"
-        rsync -aLrqW --delete --force "$STAGE/" "$PULL"
+        rsync -aLrW --delete --force "$STAGE/" "$PULL"
         if [ $? -ne 0 ]
         then
             status 'error'
