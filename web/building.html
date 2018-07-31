@@ -1,0 +1,17 @@
+<html>
+building
+<script src="../assets/js/libs/jquery/jquery.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        let parts = window.location.pathname.split('/');
+        if (typeof parts[1] !== 'undefined') {
+            let pullNo = parseInt(parts[1]);
+            if (pullNo) {
+                $.getJSON('/pull.php?pullNo='+pullNo, function(data){
+                    console.log(data);
+                });
+            }
+        }
+    });
+</script>
+</html>

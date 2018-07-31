@@ -4,11 +4,14 @@ error_reporting(E_ALL);
 
 require_once __DIR__.'/../vendor/autoload.php';
 
-$urlParts   = explode('/', ltrim($_SERVER['REQUEST_URI'], '/'));
-$pullNumber = !empty($urlParts[0]) && is_numeric(trim($urlParts[0])) ? (int) $urlParts[0] : null;
+$pullNumber = !empty($_GET['pullNo']) ? (int) $_GET['pullNo'] : null;
+if (!$pullNumber) {
+    $urlParts   = explode('/', ltrim($_SERVER['REQUEST_URI'], '/'));
+    $pullNumber = !empty($urlParts[0]) && is_numeric(trim($urlParts[0])) ? (int) $urlParts[0] : null;
+}
 if (!$pullNumber) {
     header("HTTP/1.0 404 Not Found");
-    die('Sorry, the path you put in is wonky... Try a Pull Request number.');
+    die('A pull request number is required.');
 }
 $key  = 'mautic_pull';
 $ttl  = 60;
@@ -38,14 +41,19 @@ if ($pull['mergeable'] == false) {
 
 # Add this pull to the queue to be checked/updated/installed
 define('BASE', realpath(__DIR__.'/../'));
-$filename = BASE . '/queue/'.$pullNumber.'.pull';
-if (!is_file($filename)) {
-    file_put_contents(BASE . '/queue/'.$pullNumber.'.pull', time());
+$queueFile = BASE.'/queue/'.$pullNumber.'.pull';
+if (!is_file($queueFile)) {
+    file_put_contents($queueFile, time());
 }
 
-// @todo - Get the build status (if available) and merge it with the PR output.
-
-// The pull is valid, and mergable, see if we're already building it, and return status.
+// FGet the build status (if available) and merge it with the PR output.
+$build     = [];
+$buildFile = BASE.'/data/'.$pullNumber.'/status.json';
+if (is_file($buildFile)) {
+    if ($buildStatus = file_get_contents($buildFile)) {
+        $build = json_decode($buildStatus);
+    }
+}
 
 // An arbitrary "size" of this pull request for visualization.
 // $size = $pull['comments'] + $pull['review_comments'] + $pull['commits'] + $pull['additions'] + $pull['deletions'] + $pull['changed_files'];
@@ -54,7 +62,7 @@ outputResult(
     [
         'error' => null,
         'pull'  => $pull,
-        'build' => [],
+        'build' => $build,
     ]
 );
 

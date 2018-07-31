@@ -2,10 +2,11 @@
 !.htaccess
 !.gitignore
 !.ebextensions
-code
-queue
-vendor
-web/*/
+/code
+/queue
+/vendor
+/web/*/
+!web/assets
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml

@@ -93,7 +93,7 @@ function dependencies {
 
 function overrides {
     echo "Setting parameters"
-    rsync -avhq --update "$OVERRIDES/" "$PULL"
+    rsync -havIq "$OVERRIDES/" "$PULL"
     # echo "Prepping log space"
     # touch "$DATA/apache.access.log"
     # touch "$DATA/apache.error.log"
@@ -119,7 +119,7 @@ function cacheclear {
 function cachewarm {
     cd "$PULL"
     echo "Warming up mandatory caches"
-    console cache:warmup --no-optional-warmers
+    console cache:warmup --no-optional-warmers --env=dev
 }
 
 function link {
@@ -291,7 +291,7 @@ else
 
     echo "Building/updating database"
     cd "$PULL"
-    DBCREATE=$( console doctrine:database:create --no-interaction --if-not-exists )
+    DBCREATE=$( console doctrine:database:create --no-interaction --if-not-exists --env=dev )
     if [ $? -ne 0 ]
     then
         status 'error'
@@ -304,12 +304,12 @@ else
     then
         echo "DB Already exists, running migrations and forcing schema updates."
         # @todo - slipstream from a periodic staging mysqldump for even faster deployment here.
-        console doctrine:migrations:migrate --no-interaction
-        console doctrine:schema:update --force
+        console doctrine:migrations:migrate --no-interaction --env=dev
+        console doctrine:schema:update --force --env=dev
     else
         echo "Fresh DB, installing default data and migrations."
-        console mautic:install:data --force
-        console doctrine:migrations:version --add --all --no-interaction
+        console mautic:install:data --force --env=dev
+        console doctrine:migrations:version --add --all --no-interaction --env=dev
     fi
     if [ $? -ne 0 ]
     then

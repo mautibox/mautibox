@@ -1,6 +1,6 @@
 #AllowOverride All
 Options +FollowSymLinks
-ErrorDocument 404 /pull.php
+ErrorDocument 404 /building.html
 # ErrorDocument 500 /500.html
 # ErrorDocument 503 /503.html
 # ErrorDocument 504 /504.html
