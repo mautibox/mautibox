@@ -53,7 +53,11 @@ CHANGES=0
 
 function status {
     echo "Status of $PULLNO is now: $1"
-    echo '{"sha":"'$SHA'","date":"'$DATE'","pull":'$PULLNO',"status":"'$1'"}' > "$DATA/status.json"
+    if [ ! -z "$2" ]
+    then
+        echo "Error: $2"
+    fi
+    echo '{"sha":"'$SHA'","date":"'$DATE'","pull":'$PULLNO',"status":"'$1'","error":"'$2'"}' > "$DATA/status.json"
 }
 
 function permissions {
@@ -212,8 +216,7 @@ else
         sudo rsync -aLrWq --delete --force $STAGE/ $PULL
         if [ $? -ne 0 ]
         then
-            status 'error'
-            echo "Failed sync!"
+            status 'error' 'Could not synchronize files.'
             exit 1
         fi
         CHANGES=1
@@ -225,15 +228,13 @@ else
     curl -sfL "$REPO/pull/$1.patch" --output "$PATCH.latest"
     if [ $? -ne 0 ]
     then
-        status 'error'
-        echo "Patch could not be downloaded."
+        status 'error' 'Patch could not be downloaded.'
         exit 1
     fi
     NEWPATCH=$( cat "$PATCH.latest" )
     if [ -z "$NEWPATCH" ]
     then
-        status 'error'
-        echo "Patch is empty."
+        status 'error' 'Patch is empty.'
         exit 1
     fi
     if [ -f "$PATCH" ]
@@ -248,8 +249,7 @@ else
         git apply --whitespace=nowarn --verbose "$PATCH"
         if [ $? -ne 0 ]
         then
-            status 'error'
-            echo "Patch could not be applied cleanly."
+            status 'error' 'Patch could not be applied cleanly.'
             exit 1
         fi
         CHANGES=1
@@ -301,8 +301,7 @@ else
     fi
     if [ $? -ne 0 ]
     then
-        status 'error'
-        echo "Error prepping DB."
+        status 'error' 'DB Could not be prepared.'
         exit 1
     fi
 
