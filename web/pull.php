@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 
 require_once __DIR__.'/../vendor/autoload.php';
 
+$error      = null;
 $pullNumber = !empty($_GET['pullNo']) ? (int) $_GET['pullNo'] : null;
 if (!$pullNumber) {
     $urlParts   = explode('/', ltrim($_SERVER['REQUEST_URI'], '/'));
@@ -58,6 +59,9 @@ $buildFile = BASE.'/code/data/'.$pullNumber.'/status.json';
 if (is_file($buildFile)) {
     if ($buildStatus = file_get_contents($buildFile)) {
         $build = json_decode($buildStatus);
+        if (!empty($build['error'])) {
+            throwError($build['error']);
+        }
     }
 }
 
@@ -66,19 +70,19 @@ if (is_file($buildFile)) {
 
 outputResult(
     [
-        'error' => null,
+        'error' => $error,
         'pull'  => $pull,
         'build' => $build,
     ]
 );
 
-function throwError($message)
+function throwError($error)
 {
     outputResult(
         [
-            'error' => $message,
-            'pull'  => [],
-            'build' => [],
+            'error' => $error,
+            'pull'  => !empty($pull) ? $pull : [],
+            'build' => !empty($build) ? $build : [],
         ]
     );
 }

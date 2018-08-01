@@ -19,20 +19,45 @@
 </div>
 <style>
     {{ include('@WebProfiler/Profiler/toolbar.css.twig', { 'position': position, 'floatable': true }) }}
+
+    .sf-toolbar-block span.sf-toolbar-status,
+    .sf-toolbar-block div.sf-toolbar-status {
+        background-color: transparent;
+    }
+
+    .sf-toolbar-block .sf-toolbar-status.sf-toolbar-status-green {
+        background-color: #4F805D;
+    }
+
     .sf-minitoolbar {
         min-width: 36px;
     }
-    .sf-toolbar-block.sf-toolbar-block-config .sf-toolbar-info.main {
+
+    .sf-toolbar-block.sf-toolbar-block-config .sf-toolbar-info {
         right: -36px;
     }
+
     .sf-toolbarreset {
         background-color: #1d232b;
     }
+
     .sf-toolbar-block .sf-toolbar-info,
     .sf-toolbar-block:hover .sf-toolbar-icon {
         background-color: #4e5d9d;
     }
 </style>
+<script type="text/javascript">
+    if (typeof jQuery !== 'undefined') {
+        let $user = jQuery('.form-group.login-form #username:first');
+        if ($user.length && $user.val().length === 0) {
+            let $pass = jQuery('.form-group.login-form #password:first');
+            if ($pass.length && $pass.val().length === 0) {
+                $user.val('admin');
+                $pass.val('mautic');
+            }
+        }
+    }
+</script>
 <div id="sfToolbarClearer-{{ token }}" style="clear: both; height: 36px;"></div>
 
 <div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset clear-fix" data-no-turbolink>
