@@ -5,13 +5,12 @@
 if (!defined('PULL')) {
     define('PULL', basename(realpath(MAUTIC_ROOT_DIR)));
 }
-$container->setParameter('kernel.logs_dir', realpath(MAUTIC_ROOT_DIR.'/../../data/'.PULL));
 if (!defined('DATA')) {
     define('DATA', realpath(MAUTIC_ROOT_DIR.'/../../data/'.PULL));
 }
-if (function_exists('apcu_fetch')) {
-    $pull = apcu_fetch('mautic_pull_'.PULL);
-    if ($pull && !empty($pull['title'])) {
+if (is_file(DATA.'/pull.json')) {
+    $pull = json_decode(file_get_contents(DATA.'/pull.json'), true);
+    if (is_array($pull)) {
         $pull_title = strip_tags($pull['title']);
     }
 }

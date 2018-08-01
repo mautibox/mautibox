@@ -74,6 +74,13 @@ if (is_file($buildFile)) {
     }
 }
 
+if (!empty($pull)) {
+    $pullFile = BASE.'/code/data/'.$pullNumber.'/pull.json';
+    if (!is_file($pullFile) || time() - filemtime($pullFile) > (5 * 60 * 60)) {
+        file_put_contents($pullFile, $pull);
+    }
+}
+
 if ($build['status'] == 'error') {
     throwError($build['error']);
 }
@@ -119,8 +126,10 @@ function outputResult($array)
                 $array['message'] .= '<h4>'.$array['build']['error'].'</h4>';
             }
         }
-    } else if (!empty($array['error'])) {
-        $array['message'] = '<h1>ERROR</h1><h4>'.$array['message'].'</h4>';
+    } else {
+        if (!empty($array['error'])) {
+            $array['message'] = '<h1>ERROR</h1><h4>'.$array['message'].'</h4>';
+        }
     }
     if (!empty($array['pull']['title'])) {
         $array['message'] .= '<h4>'.htmlentities(trim(strip_tags($array['pull']['title']))).'</h4>';

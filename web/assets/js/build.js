@@ -66,13 +66,13 @@
             // Fade in images once loaded.
             $overlay.find('img').each(function () {
                 $(this).load(function () {
-                    $(this).fadeTo(5000, 1);
+                    $(this).fadeTo(4000, 1);
                     // Start the fancy stuff after a while
                     setTimeout(function () {
                         if (!sad) {
                             $overlay.addClass('build-overlay-loaded');
                         }
-                    }, 5000);
+                    }, 4000);
                 });
             });
 
@@ -82,7 +82,7 @@
                 .fadeTo(1000, .7)
                 .find('#build-overlay-progressbar-inner')
                 .css('width', '0%')
-                .animate({'width': '100%'}, 60000, 'easeInSine');
+                .animate({'width': '100%'}, 25000, 'easeInSine');
 
             // Fade in the message
             $overlay.find('#build-overlay-message').fadeTo(2000, 1);
