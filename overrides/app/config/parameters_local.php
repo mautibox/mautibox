@@ -34,10 +34,3 @@ $parameters = [
     'log_path'              => realpath(MAUTIC_ROOT_DIR.'/../../data/'.PULL),
     'tmp_path'              => '/tmp/'.PULL,
 ];
-putenv('RDS_HOSTNAME=');
-putenv('RDS_PORT=');
-putenv('RDS_USERNAME=');
-putenv('RDS_PASSWORD=');
-putenv('APP_URL=');
-putenv('MAILER_FROM_NAME=');
-putenv('MAILER_FROM_EMAIL=');
