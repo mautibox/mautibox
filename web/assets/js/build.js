@@ -16,6 +16,17 @@
             },
         });
 
+    $(document).ready(function () {
+        let $user = $('.form-group.login-form #username:first');
+        if ($user.length && $user.val().length === 0) {
+            let $pass = $('.form-group.login-form #password:first');
+            if ($pass.length && $pass.val().length === 0) {
+                $user.val('admin');
+                $pass.val('mautic');
+            }
+        }
+    });
+
     var sad = false;
     let build_overlay_sad = function () {
         // console.warn(':(');

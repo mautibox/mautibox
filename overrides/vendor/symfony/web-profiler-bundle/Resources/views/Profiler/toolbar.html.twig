@@ -50,21 +50,7 @@
         background-color: #4e5d9d;
     }
 </style>
-<script type="text/javascript">
-    if (typeof jQuery !== 'undefined') {
-        jQuery(document).ready(function(){
-            let $user = jQuery('.form-group.login-form #username:first');
-            if ($user.length && $user.val().length === 0) {
-                let $pass = jQuery('.form-group.login-form #password:first');
-                if ($pass.length && $pass.val().length === 0) {
-                    $user.val('admin');
-                    $pass.val('mautic');
-                }
-            }
-        });
-    }
-</script>
-<script src="/assets/js/build.js"></script>
+<script src="/assets/js/build.js" data-source="mautibox"></script>
 <div id="sfToolbarClearer-{{ token }}" style="clear: both; height: 36px;"></div>
 
 <div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset clear-fix" data-no-turbolink>
