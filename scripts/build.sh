@@ -292,10 +292,12 @@ else
         # @todo - slipstream from a periodic staging mysqldump for even faster deployment here.
         console doctrine:migrations:migrate --no-interaction --env=dev
         console doctrine:schema:update --force --env=dev
+        console mautic:plugins:reload --env=dev
     else
         echo "Fresh DB, installing default data and migrations."
         console mautic:install:data --force --env=dev
         console doctrine:migrations:version --add --all --no-interaction --env=dev
+        console mautic:plugins:reload --env=dev
     fi
     if [ $? -ne 0 ]
     then
