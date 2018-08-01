@@ -51,15 +51,6 @@ OLDPATCH=""
 NEWPATCH=""
 CHANGES=0
 
-function console {
-    if [ -f "/opt/elasticbeanstalk/support/envvars" ]
-    then
-        sudo -u $USER bash -c ". /opt/elasticbeanstalk/support/envvars ; /usr/bin/php app/console $@"
-    else
-        php ./app/console $@
-    fi
-}
-
 function status {
     echo "Status of $PULLNO is now: $1"
     echo '{"sha":"'$SHA'","date":"'$DATE'","pull":'$PULLNO',"status":"'$1'"}' > "$DATA/status.json"
