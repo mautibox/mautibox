@@ -1,17 +1,9 @@
 <html>
-building
-<script src="/assets/js/libs/jquery/jquery.min.js"></script>
-<script type="text/javascript">
-    $(function() {
-        let parts = window.location.pathname.split('/');
-        if (typeof parts[1] !== 'undefined') {
-            let pullNo = parseInt(parts[1]);
-            if (pullNo) {
-                $.getJSON('/pull.php?pullNo='+pullNo, function(data){
-                    console.log(data);
-                });
-            }
-        }
-    });
-</script>
+<head>
+    <title>Mautibox</title>
+    <script src="/assets/js/libs/jquery/jquery.min.js"></script>
+    <script src="/assets/js/build.js"></script>
+</head>
+<body style="background-color: #282a2e">
+</body>
 </html>

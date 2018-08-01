@@ -1,0 +1,175 @@
+html {
+    min-height: 100%;
+}
+
+@-webkit-keyframes rotation {
+    0% {
+        -webkit-transform: rotate(359deg);
+    }
+    100% {
+        -webkit-transform: rotate(0deg);
+    }
+}
+
+@-webkit-keyframes pulse {
+    0% {
+        width: 100px;
+        margin-top: -50px;
+        margin-left: -50px
+    }
+    50% {
+        width: 600px;
+        margin-top: -300px;
+        margin-left: -300px
+    }
+    100% {
+        width: 100px;
+        margin-top: -50px;
+        margin-left: -50px
+    }
+}
+
+@-webkit-keyframes fade {
+    0% {
+        opacity: 1;
+    }
+    10% {
+        opacity: .5;
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    90% {
+        opacity: .5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/*@-webkit-keyframes colorpulse {*/
+    /*0% {*/
+        /*background-color: #4e5e9e;*/
+    /*}*/
+    /*50% {*/
+        /*background-color: #ffffff;*/
+    /*}*/
+    /*100% {*/
+        /*background-color: #4e5e9e;*/
+    /*}*/
+/*}*/
+
+@-webkit-keyframes hue {
+    0% {
+        -webkit-filter: hue-rotate(0deg) grayscale(100%);
+    }
+    20% {
+        -webkit-filter: hue-rotate(0deg) grayscale(0%);
+    }
+    90% {
+        -webkit-filter: hue-rotate(359deg) grayscale(0%);
+    }
+    100% {
+        -webkit-filter: hue-rotate(0deg) grayscale(100%);
+    }
+}
+
+#build-overlay * {
+    /* css reset to go here */
+
+}
+
+#build-overlay,
+#build-overlay #build-overlay-bg {
+    position: fixed;
+    display: block;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    z-index: 2147483647;
+}
+
+#build-overlay #build-overlay-bg {
+    opacity: 0;
+    filter: alpha(opacity=0);
+    background: #343438;
+    -webkit-filter: grayscale(100%);
+}
+
+#build-overlay img {
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+
+#build-overlay img.build-overlay-spinner {
+    height: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    margin-top: -50px;
+    margin-left: -50px;
+    /*-webkit-filter: grayscale(100%);*/
+}
+
+#build-overlay #build-overlay-message a {
+    color: #cecece;
+    text-decoration: none;
+}
+
+#build-overlay #build-overlay-message {
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    color: #cecece;
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    left: 0px;
+    top: 50%;
+    margin-top: -48px;
+    font-size: 13px;
+    line-height: normal;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    text-shadow: -1px -1px 0 rgba(52, 52, 56, .3), -1px 1px 0 rgba(52, 52, 56, .3), 1px -1px 0 rgba(52, 52, 56, .3), 1px 1px 0 rgba(52, 52, 56, .3);
+    z-index: 2147483647;
+}
+
+/*#build-overlay.build-overlay-loaded #build-overlay-progressbar-inner {*/
+    /*-webkit-animation: hue 30s infinite ease-in-out;*/
+/*}*/
+
+#build-overlay.build-overlay-loaded #build-overlay-bg {
+    -webkit-animation: hue 18s infinite ease-in-out;
+}
+
+#build-overlay.build-overlay-loaded img.build-overlay-spinner {
+    -webkit-animation: rotation 40s infinite linear, pulse 80s infinite ease-in-out, fade 20s infinite ease-in-out;
+}
+
+#build-overlay-progressbar {
+    width: 50%;
+    margin-left: -25%;
+    height: 2px;
+    position: absolute;
+    opacity: 0;
+    top: 50%;
+    left: 50%;
+    padding: 0px;
+    background: #595d62;
+}
+
+#build-overlay-progressbar-inner {
+    width: 0%;
+    height: 100%;
+    background-color: #00b49d;
+}

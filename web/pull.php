@@ -6,6 +6,7 @@ require_once __DIR__.'/../vendor/autoload.php';
 
 define('BASE', realpath(__DIR__.'/../'));
 $error      = null;
+$message    = null;
 $pullNumber = !empty($_GET['pullNo']) ? (int) $_GET['pullNo'] : null;
 if (!$pullNumber) {
     $urlParts   = explode('/', ltrim($_SERVER['REQUEST_URI'], '/'));
@@ -40,7 +41,9 @@ if (!$cached) {
         throwError('Pull request must be open.');
     }
     if ($pull['mergeable'] == false) {
-        throwError('This pull request cannot be tested. Standard checks must pass and conflicts must be resolved first.');
+        throwError(
+            'This pull request cannot be tested. Standard checks must pass and conflicts must be resolved first.'
+        );
     }
 
     # Add this pull to the queue to be checked/updated/installed
@@ -71,14 +74,19 @@ if (is_file($buildFile)) {
     }
 }
 
+if ($build['status'] == 'error') {
+    throwError($build['error']);
+}
+
 // An arbitrary "size" of this pull request for visualization.
 // $size = $pull['comments'] + $pull['review_comments'] + $pull['commits'] + $pull['additions'] + $pull['deletions'] + $pull['changed_files'];
 
 outputResult(
     [
-        'error' => $error,
-        'pull'  => $pull,
-        'build' => $build,
+        'error'   => $error,
+        'message' => $message,
+        'pull'    => $pull,
+        'build'   => $build,
     ]
 );
 
@@ -86,15 +94,36 @@ function throwError($error)
 {
     outputResult(
         [
-            'error' => $error,
-            'pull'  => !empty($pull) ? $pull : [],
-            'build' => !empty($build) ? $build : [],
+            'error'   => $error,
+            'message' => !empty($message) ? $message : $error,
+            'pull'    => !empty($pull) ? $pull : [],
+            'build'   => !empty($build) ? $build : [],
         ]
     );
 }
 
 function outputResult($array)
 {
+    // Customize the message.
+    if (!empty($array['build']['status'])) {
+        if ($array['build']['status'] == 'building' && !empty($array['pull']['number'])) {
+            $array['message'] = '<h2>BUILDING '.
+                '<a href="https://github.com/mautic/mautic/pull/'.$array['pull']['number'].'" target="_blank">'.
+                $array['pull']['number'].
+                '</a></h2>';
+        } elseif ($array['build']['status'] == 'ready') {
+            $array['message'] = '<h1>READY</h1>';
+        } elseif ($array['build']['status'] == 'error') {
+            $array['message'] = '<h1>ERROR</h1>';
+            if (!empty($array['build']['error'])) {
+                $array['message'] .= '<h1>'.$array['build']['error'].'</h1>';
+            }
+        }
+        if (!empty($array['pull']['title'])) {
+            $array['message'] .= '<h1>'.htmlentities(trim(strip_tags($array['pull']['title']))).'</h1>';
+        }
+    }
+
     header("HTTP/1.1 200 OK");
     header('Content-Type: application/json');
     echo json_encode($array);
