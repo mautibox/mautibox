@@ -286,7 +286,7 @@ else
     cd "$PULL"
     DBCREATE=$( console doctrine:database:create --no-interaction --if-not-exists --env=dev )
     echo "$DBCREATE"
-    if [[ $DBCREATE == *"database exists."* ]]
+    if [[ $DBCREATE == *"Skipped"* ]]
     then
         echo "DB Already exists, running migrations and forcing schema updates."
         # @todo - slipstream from a periodic staging mysqldump for even faster deployment here.
