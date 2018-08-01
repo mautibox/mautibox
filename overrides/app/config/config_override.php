@@ -6,40 +6,16 @@ if (!defined('PULL')) {
     define('PULL', basename(realpath(MAUTIC_ROOT_DIR)));
 }
 $container->setParameter('kernel.logs_dir', realpath(MAUTIC_ROOT_DIR.'/../../data/'.PULL));
-// $container->setParameter('kernel.debug', true);
-// $container->loadFromExtension(
-//     'framework',
-//     [
-//         'profiler' => [
-//             'collect' => true,
-//         ],
-//     ]
-// );
-// $container->loadFromExtension(
-//     'web_profiler',
-//     [
-//         'toolbar'             => true,
-//         'intercept_redirects' => false,
-//     ]
-// );
-// $container->loadFromExtension(
-//     'swiftmailer',
-//     [
-//         'disable_delivery' => false,
-//     ]
-// );
-//
-// $container->loadFromExtension(
-//     'web_profiler',
-//     [
-//         'toolbar'             => true,
-//         'intercept_redirects' => false,
-//         'only_exceptions'     => false,
-//     ]
-// );
-// throw new \Exception('asf');
-
-//Twig Configuration
+if (!defined('DATA')) {
+    define('DATA', realpath(MAUTIC_ROOT_DIR.'/../../data/'.PULL));
+}
+if (function_exists('apcu_fetch')) {
+    $pull = apcu_fetch('mautic_pull_'.PULL);
+    if ($pull && !empty($pull['title'])) {
+        $pull_title = strip_tags($pull['title']);
+    }
+}
+$container->setParameter('kernel.logs_dir', DATA);
 $container->loadFromExtension(
     'twig',
     [
@@ -50,45 +26,7 @@ $container->loadFromExtension(
         'globals'          => [
             'mautic_version' => MAUTIC_VERSION,
             'pull_request'   => PULL,
+            'pull_title'     => !empty($pull_title) ? $pull_title : 'Pull Request',
         ],
     ]
 );
-
-
-// Log notices and above, with full traces and output to *.log files for a week.
-// $container->loadFromExtension(
-//     'monolog',
-//     [
-//         'channels' => [
-//             'mautic',
-//         ],
-//         'handlers' => [
-//             'main'   => [
-//                 'formatter'    => 'mautic.monolog.fulltrace.formatter',
-//                 'type'         => 'fingers_crossed',
-//                 'buffer_size'  => '200',
-//                 'action_level' => 'notice',
-//                 'handler'      => 'nested',
-//                 'channels'     => [
-//                     '!mautic',
-//                 ],
-//             ],
-//             'nested' => [
-//                 'type'      => 'rotating_file',
-//                 'path'      => '%mautic.log_path%/%kernel.environment%.log',
-//                 'level'     => 'notice',
-//                 'max_files' => 7,
-//             ],
-//             'mautic' => [
-//                 'formatter' => 'mautic.monolog.fulltrace.formatter',
-//                 'type'      => 'rotating_file',
-//                 'path'      => '%mautic.log_path%/mautic_%kernel.environment%.log',
-//                 'level'     => 'notice',
-//                 'channels'  => [
-//                     'mautic',
-//                 ],
-//                 'max_files' => 7,
-//             ],
-//         ],
-//     ]
-// );
