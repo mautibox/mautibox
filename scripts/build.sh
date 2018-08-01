@@ -114,8 +114,14 @@ function cacheclear {
 
 function cachewarm {
     cd "$PULL"
-    echo "Warming up mandatory caches"
-    console cache:warmup --no-optional-warmers --env=dev
+    echo "Warming up caches"
+    console cache:warmup --env=dev --quiet
+}
+
+function plugins {
+    cd "$PULL"
+    echo "Re/loading plugins and warming cache."
+    console mautic:plugins:reload --env=dev
 }
 
 function link {
@@ -212,7 +218,7 @@ else
     fi
     if [ "$NEWSHA" != "$SHA" ]
     then
-        echo "Syncing pull request workspace: rsync -aLrWq --delete --force $STAGE/ $PULL"
+        echo "Syncing pull request workspace."
         sudo rsync -aLrWq --delete --force $STAGE/ $PULL
         if [ $? -ne 0 ]
         then
@@ -261,8 +267,9 @@ else
     # If there were no changes, end.
     if [ "$CHANGES" -ne 1 ]
     then
-        echo "Environment is up to date."
+        echo "Build is up to date."
         link
+        status 'ready'
         exit 0
     fi
 
@@ -272,7 +279,7 @@ else
     if cmp "$STAGE/composer.lock" "$PULL/composer.lock"
     then
         cd "$PULL"
-        echo "Possible dependency changes detected"
+        echo "Dependency changes detected."
         dependencies
     fi
 
@@ -282,22 +289,21 @@ else
 
     permissions
 
-    echo "Building/updating database"
+    echo "Re/loading database."
     cd "$PULL"
     DBCREATE=$( console doctrine:database:create --no-interaction --if-not-exists --env=dev )
     echo "$DBCREATE"
     if [[ $DBCREATE == *"Skipped"* ]]
     then
-        echo "DB Already exists, running migrations and forcing schema updates."
-        # @todo - slipstream from a periodic staging mysqldump for even faster deployment here.
+        echo "Running migrations."
         console doctrine:migrations:migrate --no-interaction --env=dev
+        echo "Forcing schema updates."
         console doctrine:schema:update --force --env=dev
-        console mautic:plugins:reload --env=dev
     else
-        echo "Fresh DB, installing default data and migrations."
+        echo "Installing default data."
         console mautic:install:data --force --env=dev
+        echo "Setting migration versions."
         console doctrine:migrations:version --add --all --no-interaction --env=dev
-        console mautic:plugins:reload --env=dev
     fi
     if [ $? -ne 0 ]
     then
@@ -308,6 +314,8 @@ else
     link
 
     cachewarm
+
+    plugins
 
     cd "$PULL"
     SHA=$( git rev-parse --short HEAD )
