@@ -28,7 +28,7 @@ then
 fi
 if [ -z "$FREQUENCY" ]
 then
-    FREQUENCY=1
+    FREQUENCY=5
 fi
 
 BASEDIR=$(dirname "$BASH_SOURCE")
@@ -57,7 +57,7 @@ function status {
     then
         echo "Error: $2"
     fi
-    echo '{"sha":"'$SHA'","date":"'$DATE'","pull":'$PULLNO',"status":"'$1'","error":"'$2'"}' > "$DATA/status.json"
+    echo '{"sha":"'$SHA'","date":"'$DATE'","pull":'$PULLNO',"status":"'$1'","error":"'$2'"}' > "$DATA/build.json"
 }
 
 function permissions {

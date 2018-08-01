@@ -11,7 +11,9 @@ if (!defined('DATA')) {
 if (is_file(DATA.'/pull.json')) {
     $pull = json_decode(file_get_contents(DATA.'/pull.json'), true);
     if (is_array($pull)) {
-        $pull_title = strip_tags($pull['title']);
+        $pull_title  = strip_tags($pull['title']);
+        $pull_user   = strip_tags($pull['user']['login']);
+        $pull_avatar = strip_tags($pull['user']['avatar_url']);
     }
 }
 $container->setParameter('kernel.logs_dir', DATA);
@@ -26,6 +28,8 @@ $container->loadFromExtension(
             'mautic_version' => MAUTIC_VERSION,
             'pull_request'   => PULL,
             'pull_title'     => !empty($pull_title) ? $pull_title : 'Pull Request',
+            'pull_user'      => !empty($pull_user) ? $pull_user : '',
+            'pull_avatar'    => !empty($pull_avatar) ? '<img src="'.$pull_avatar.'">' : '',
         ],
     ]
 );

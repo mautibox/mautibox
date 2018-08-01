@@ -102,7 +102,17 @@
                 <span class="sf-toolbar-label">&nbsp; {{ pull_title }}</span>
             </div>
         </a>
-        {#<div class="sf-toolbar-info">Pull</div>#}
+        <div class="sf-toolbar-info">
+            <div class="sf-toolbar-info-piece">
+                <b>Title</b>
+                <span class="sf-toolbar-status">{{ pull_title }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Author</b>
+                <span class="sf-toolbar-status">{{ pull_user }}</span>
+                {{ pull_avatar }}
+            </div>
+        </div>
     </div>
 
     <a class="hide-button" title="Close Toolbar" tabindex="-1" accesskey="D" onclick="

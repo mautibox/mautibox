@@ -64,7 +64,7 @@ $build     = [
     'status' => 'building',
     'error'  => '',
 ];
-$buildFile = BASE.'/code/data/'.$pullNumber.'/status.json';
+$buildFile = BASE.'/code/data/'.$pullNumber.'/build.json';
 if (is_file($buildFile)) {
     if ($buildStatus = file_get_contents($buildFile)) {
         $build = json_decode($buildStatus, true);
