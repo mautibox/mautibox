@@ -8,6 +8,7 @@
 /queue/*
 !/queue/.gitkeep
 #/vendor
+/web/**
 /web/*/
 !/web/assets
 !/web/assets/*
