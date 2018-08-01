@@ -75,6 +75,9 @@ if (is_file($buildFile)) {
 }
 
 if (!empty($pull)) {
+    if (!is_dir(BASE.'/code/data/'.$pullNumber)) {
+        mkdir(BASE.'/code/data/'.$pullNumber);
+    }
     $pullFile = BASE.'/code/data/'.$pullNumber.'/pull.json';
     if (!is_file($pullFile) || time() - filemtime($pullFile) > (5 * 60 * 60)) {
         file_put_contents($pullFile, $pull);
