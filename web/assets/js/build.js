@@ -82,7 +82,7 @@
                 .fadeTo(1000, .7)
                 .find('#build-overlay-progressbar-inner')
                 .css('width', '0%')
-                .animate({'width': '100%'}, 30000, 'easeInSine');
+                .animate({'width': '100%'}, 60000, 'easeInSine');
 
             // Fade in the message
             $overlay.find('#build-overlay-message').fadeTo(2000, 1);
@@ -94,7 +94,7 @@
                         $overlay.fadeTo(500, 0);
                         setTimeout(function () {
                             $overlay.remove();
-                        }, 500);
+                        }, 1000);
                     }
                 }
             });
@@ -134,6 +134,7 @@
                             ) {
                                 // Reload the page.
                                 window.location.reload();
+                                return false;
                             }
                         });
                     }, 500);
@@ -145,6 +146,7 @@
                 ) {
                     // Reload the page.
                     window.location.reload();
+                    return false;
                 }
             }
             else {

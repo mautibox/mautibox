@@ -115,7 +115,7 @@ function cacheclear {
 function cachewarm {
     cd "$PULL"
     echo "Warming up caches"
-    console cache:warmup --env=dev --quiet
+    console cache:warmup --no-optional-warmers --env=dev --quiet
 }
 
 function plugins {
