@@ -48,7 +48,7 @@ if (!is_file($queueFile)) {
 
 // FGet the build status (if available) and merge it with the PR output.
 $build     = [];
-$buildFile = BASE.'/data/'.$pullNumber.'/status.json';
+$buildFile = BASE.'/code/data/'.$pullNumber.'/status.json';
 if (is_file($buildFile)) {
     if ($buildStatus = file_get_contents($buildFile)) {
         $build = json_decode($buildStatus);
