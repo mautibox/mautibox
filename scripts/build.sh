@@ -293,15 +293,8 @@ else
     echo "Building/updating database"
     cd "$PULL"
     DBCREATE=$( console doctrine:database:create --no-interaction --if-not-exists --env=dev )
-    if [ $? -ne 0 ]
-    then
-        status 'error'
-        echo "Could not install DB."
-        echo "$DBCREATE"
-        exit 1
-    fi
     echo "$DBCREATE"
-    if [[ $DBCREATE == *"Skipped."* ]]
+    if [[ $DBCREATE == *"database exists."* ]]
     then
         echo "DB Already exists, running migrations and forcing schema updates."
         # @todo - slipstream from a periodic staging mysqldump for even faster deployment here.
