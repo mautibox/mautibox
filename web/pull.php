@@ -80,7 +80,7 @@ if (!empty($pull)) {
     }
     $pullFile = BASE.'/code/data/'.$pullNumber.'/pull.json';
     if (!is_file($pullFile) || time() - filemtime($pullFile) > (5 * 60 * 60)) {
-        file_put_contents($pullFile, $pull);
+        file_put_contents($pullFile, json_encode($pull));
     }
 }
 
