@@ -19,6 +19,16 @@
 </div>
 <style>
     {{ include('@WebProfiler/Profiler/toolbar.css.twig', { 'position': position, 'floatable': true }) }}
+    .sf-toolbar-block.sf-toolbar-block-config .sf-toolbar-info.main {
+        right: -36px;
+    }
+    .sf-toolbarreset {
+        background-color: #1d232b;
+    }
+    .sf-toolbar-block .sf-toolbar-info,
+    .sf-toolbar-block:hover .sf-toolbar-icon {
+        background-color: #4e5d9d;
+    }
 </style>
 <div id="sfToolbarClearer-{{ token }}" style="clear: both; height: 36px;"></div>
 
