@@ -79,6 +79,7 @@ html {
 
 #build-overlay * {
     /* css reset to go here */
+    pointer-events: none;
 
 }
 
@@ -135,7 +136,7 @@ html {
     width: 100%;
     left: 0px;
     top: 50%;
-    margin-top: -48px;
+    margin-top: -52px;
     font-size: 13px;
     line-height: normal;
     opacity: 0;
