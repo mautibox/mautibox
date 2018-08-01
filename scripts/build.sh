@@ -271,6 +271,7 @@ else
     if [ "$CHANGES" -ne 1 ]
     then
         echo "Environment is up to date."
+        link
         exit 0
     fi
 
