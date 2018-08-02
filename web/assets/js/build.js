@@ -154,7 +154,7 @@
                                 return false;
                             }
                         });
-                    }, 500);
+                    }, 1000);
                 }
                 else if (
                     typeof window.mautiboxReloadNeeded !== 'undefined'
