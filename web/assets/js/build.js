@@ -134,7 +134,7 @@
                         build_overlay_load(data.message);
                     }
                     timer = setInterval(function () {
-                        check_for_completion();
+                        check_for_completion(pullNo);
                     }, 500);
                 }
                 else if (
@@ -161,7 +161,7 @@
             }, 60000);
         });
     };
-    let check_for_completion = function () {
+    let check_for_completion = function (pullNo) {
         $.getJSON('/pull.php?pullNo=' + pullNo, function (data) {
             // console.log(data);
             if (typeof data.message !== 'undefined' && data.message) {
