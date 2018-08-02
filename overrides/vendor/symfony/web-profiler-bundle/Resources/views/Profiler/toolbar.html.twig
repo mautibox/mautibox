@@ -110,13 +110,19 @@
         </a>
         <div class="sf-toolbar-info">
             <div class="sf-toolbar-info-piece">
-                <b>Title</b>
-                <span class="sf-toolbar-status">{{ pull_title }}</span>
+                <b>Description</b>
+                <span class="sf-toolbar-status">{{ pull_body }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Labels</b>
+                <span class="sf-toolbar-status">{{ pull_labels }}</span>
             </div>
             <div class="sf-toolbar-info-piece">
                 <b>Author</b>
-                <span class="sf-toolbar-status">{{ pull_user }}</span>
-                <img src="{{ pull_avatar }}">
+                <a href="https://github.com/{{ pull_user }}" target="_blank">
+                    <img src="{{ pull_avatar }}" style="position:relative; top: 7px;">
+                    <span class="sf-toolbar-status">{{ pull_user }}</span>
+                </a>
             </div>
         </div>
     </div>
