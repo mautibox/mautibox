@@ -116,6 +116,7 @@
         }
     };
 
+    var timer;
     let check_for_build = function (pullNo) {
         $.getJSON('/pull.php?pullNo=' + pullNo, function (data) {
             console.log(data);
@@ -132,7 +133,7 @@
                     if (typeof data.message !== 'undefined' && data.message) {
                         build_overlay_load(data.message);
                     }
-                    setInterval(function () {
+                    timer = setInterval(function () {
                         $.getJSON('/pull.php?pullNo=' + pullNo, function (data) {
                             // console.log(data);
                             if (typeof data.message !== 'undefined' && data.message) {
@@ -144,6 +145,11 @@
                                 && data.build.status === 'ready'
                             ) {
                                 // Reload the page.
+                                clearInterval(timer);
+                                setTimeout(function() {
+                                    data.message = data.message.replace('READY', 'NEARLY THERE');
+                                    build_overlay_load(data.message);
+                                }, 1000);
                                 window.location.reload();
                                 return false;
                             }
