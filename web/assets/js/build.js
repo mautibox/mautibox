@@ -134,27 +134,8 @@
                         build_overlay_load(data.message);
                     }
                     timer = setTimeout(function () {
-                        $.getJSON('/pull.php?pullNo=' + pullNo, function (data) {
-                            // console.log(data);
-                            if (typeof data.message !== 'undefined' && data.message) {
-                                build_overlay_load(data.message);
-                            }
-                            if (
-                                typeof data.error !== 'undefined'
-                                && (!data.error || data.error.length === 0)
-                                && data.build.status === 'ready'
-                            ) {
-                                // Reload the page.
-                                clearTimeout(timer);
-                                setTimeout(function () {
-                                    data.message = data.message.replace('READY', 'NEARLY THERE');
-                                    build_overlay_load(data.message);
-                                }, 1000);
-                                window.location.reload();
-                                return false;
-                            }
-                        });
-                    }, 1000);
+                        check_for_completion();
+                    }, 500);
                 }
                 else if (
                     typeof window.mautiboxReloadNeeded !== 'undefined'
@@ -180,6 +161,28 @@
             }, 60000);
         });
     };
+    let check_for_completion = function () {
+        $.getJSON('/pull.php?pullNo=' + pullNo, function (data) {
+            // console.log(data);
+            if (typeof data.message !== 'undefined' && data.message) {
+                build_overlay_load(data.message);
+            }
+            if (
+                typeof data.error !== 'undefined'
+                && (!data.error || data.error.length === 0)
+                && data.build.status === 'ready'
+            ) {
+                // Reload the page.
+                clearTimeout(timer);
+                setTimeout(function () {
+                    data.message = data.message.replace('READY', 'NEARLY THERE');
+                    build_overlay_load(data.message);
+                }, 1000);
+                window.location.reload();
+                return false;
+            }
+        });
+    };
 
     // Discern the PR number and get details.
     let parts = window.location.pathname.split('/');
@@ -189,4 +192,6 @@
             check_for_build(pullNo);
         }
     }
-})();
+};
+)
+();
