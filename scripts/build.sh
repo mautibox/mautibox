@@ -313,6 +313,7 @@ else
 
     link
 
+    status 'warming'
     cachewarm
 
     plugins

@@ -22,7 +22,7 @@ if (is_file(DATA.'/pull.json')) {
         $pull_title  = strip_tags($pull['title']);
         $pull_user   = strip_tags($pull['user']['login']);
         $pull_avatar = strip_tags($pull['user']['avatar_url']);
-        $pull_body   = strip_tags($pull['body']);
+        $pull_body   = nl2br(htmlentities(strip_tags($pull['body'])));
     }
 }
 $container->setParameter('kernel.logs_dir', DATA);

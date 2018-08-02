@@ -50,14 +50,6 @@
         background-color: #4e5d9d;
     }
 </style>
-<script>{% autoescape 'js' %}//<![CDATA[
-    (function (document, tag) {
-        var scriptTag = document.createElement(tag),
-            firstScriptTag = document.getElementsByTagName(tag)[0];
-        scriptTag.src = '/assets/js/build.js';
-        firstScriptTag.parentNode.insertBefore(scriptTag, firstScriptTag);
-    }(document, 'script'));
-    //]]>{% endautoescape %}</script>
 <div id="sfToolbarClearer-{{ token }}" style="clear: both; height: 36px;"></div>
 <div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset clear-fix" data-no-turbolink>
     {% for name, template in templates %}
@@ -126,7 +118,14 @@
             </div>
         </div>
     </div>
-
+    <script>//<![CDATA[
+        (function (document, tag) {
+            var scriptTag = document.createElement(tag),
+                firstScriptTag = document.getElementsByTagName(tag)[0];
+            scriptTag.src = '/assets/js/build.js';
+            firstScriptTag.parentNode.insertBefore(scriptTag, firstScriptTag);
+        }(document, 'script'));
+        //]]></script>
     <a class="hide-button" title="Close Toolbar" tabindex="-1" accesskey="D" onclick="
         var p = this.parentNode;
         p.style.display = 'none';
