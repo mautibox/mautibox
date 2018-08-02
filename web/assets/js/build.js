@@ -128,7 +128,7 @@
             if (data.error == null) {
                 // All is well.
                 sad = false;
-                if (data.build.status === 'building') {
+                if (data.build.status === 'building' || data.build.status === 'queued' || data.build.status === 'warming') {
                     if (typeof data.message !== 'undefined' && data.message) {
                         build_overlay_load(data.message);
                     }

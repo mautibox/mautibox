@@ -113,26 +113,18 @@ function outputResult($array)
 {
     // Customize the message.
     if (!empty($array['build']['status'])) {
-        if ($array['build']['status'] == 'building' && !empty($array['pull']['number'])) {
-            $array['message'] = '<h1>BUILDING '.
-                '<a href="https://github.com/mautic/mautic/pull/'.$array['pull']['number'].'" target="_blank">'.
-                $array['pull']['number'].
-                '</a></h1>';
-        } elseif ($array['build']['status'] == 'ready') {
-            $array['message'] = '<h1>READY</h1>';
-        } elseif ($array['build']['status'] == 'error') {
-            $array['message'] = '<h1>BUILD ERROR</h1>';
-            if (!empty($array['build']['error'])) {
-                $array['message'] .= '<h4>'.$array['build']['error'].'</h4>';
-            }
-        }
-    } else {
-        if (!empty($array['error'])) {
-            $array['message'] = '<h1>ERROR</h1><h4>'.$array['message'].'</h4>';
+        $array['message'] = '<h1>'.strtoupper($array['build']['status']).'</h1>';
+        if (!empty($array['build']['error'])) {
+            $array['message'] .= '<h4>'.$array['build']['error'].'</h4>';
         }
     }
+    if (!empty($array['error'])) {
+        $array['message'] = '<h1>ERROR</h1><h4>'.$array['message'].'</h4>';
+    }
+
     if (!empty($array['pull']['title'])) {
-        $array['message'] .= '<h4>'.htmlentities(trim(strip_tags($array['pull']['title']))).'</h4>';
+        $array['message'] .= '<a href="https://github.com/mautic/mautic/pull/'.$array['pull']['number'].'" target="_blank">'.
+            '<h4>'.htmlentities(trim(strip_tags($array['pull']['title']))).'</h4></a>';
     }
 
     header("HTTP/1.1 200 OK");
