@@ -26,9 +26,13 @@ if [ -f "/opt/elasticbeanstalk/support/envvars" ]
 then
     . /opt/elasticbeanstalk/support/envvars
 fi
-if [ -z "$FREQUENCY" ]
+if [ -z "$PULLFREQUENCY" ]
 then
-    FREQUENCY=5
+    PULLFREQUENCY=1
+fi
+if [ -z "$STAGEFREQUENCY" ]
+then
+    STAGEFREQUENCY=10
 fi
 
 BASEDIR=$(dirname "$BASH_SOURCE")
@@ -170,9 +174,9 @@ function dataprep {
     fi
 }
 
-if [ ! -z $( find "$PATCH" -mmin -$FREQUENCY 2>/dev/null ) ]
+if [ ! -z $( find "$PATCH" -mmin -$PULLFREQUENCY 2>/dev/null ) ]
 then
-    echo "The PULL is recent enough. Builds permitted every $FREQUENCY minutes."
+    echo "The PULL is recent enough. Builds permitted every $PULLFREQUENCY minutes."
 else
     # Prep data folder.
     dataprep
@@ -186,9 +190,9 @@ else
     fi
 
     # Create/update stage as needed.
-    if [ ! -z $( find "$STAGE/app/bootstrap.php.cache" -mmin -$FREQUENCY 2>/dev/null ) ]
+    if [ ! -z $( find "$STAGE/app/bootstrap.php.cache" -mmin -$STAGEFREQUENCY 2>/dev/null ) ]
     then
-        echo "Stage is recent enough. Updates every $FREQUENCY minutes."
+        echo "Stage is recent enough. Updates every $STAGEFREQUENCY minutes."
         cd "$STAGE"
         NEWSHA=$( git rev-parse --short HEAD )
     else
