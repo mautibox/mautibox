@@ -175,7 +175,7 @@
                 // Reload the page.
                 clearTimeout(timer);
                 setTimeout(function () {
-                    data.message = data.message.replace('READY', 'NEARLY THERE');
+                    data.message = data.message.replace('READY', 'LOADING');
                     build_overlay_load(data.message);
                 }, 1000);
                 window.location.reload();
@@ -192,6 +192,4 @@
             check_for_build(pullNo);
         }
     }
-};
-)
-();
+})();
