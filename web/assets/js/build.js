@@ -133,7 +133,7 @@
                     if (typeof data.message !== 'undefined' && data.message) {
                         build_overlay_load(data.message);
                     }
-                    timer = setTimeout(function () {
+                    timer = setInterval(function () {
                         check_for_completion();
                     }, 500);
                 }
@@ -156,7 +156,7 @@
             }
             // Try again in a while.
             setTimeout(function () {
-                clearTimeout(timer);
+                clearInterval(timer);
                 check_for_build(pullNo);
             }, 60000);
         });
@@ -173,7 +173,7 @@
                 && data.build.status === 'ready'
             ) {
                 // Reload the page.
-                clearTimeout(timer);
+                clearInterval(timer);
                 setTimeout(function () {
                     data.message = data.message.replace('READY', 'LOADING');
                     build_overlay_load(data.message);
