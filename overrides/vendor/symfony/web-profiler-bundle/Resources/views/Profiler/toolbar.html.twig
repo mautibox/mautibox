@@ -100,20 +100,20 @@
                 <span class="sf-toolbar-label">&nbsp; {{ pull_title | raw }}</span>
             </div>
         </a>
-        <div class="sf-toolbar-info" style="overflow-x: scroll; text-align: left;">
+        <div class="sf-toolbar-info" style="overflow-x: scroll;">
             <div class="sf-toolbar-info-piece">
                 <b>Description</b>
-                <span class="sf-toolbar-status">{{ pull_body | raw }}</span>
+                <span class="sf-toolbar-status" style="text-align: left;">{{ pull_body | raw }}</span>
             </div>
             <div class="sf-toolbar-info-piece">
                 <b>Labels</b>
-                <span class="sf-toolbar-status">{{ pull_labels }}</span>
+                <span class="sf-toolbar-status" style="text-align: left;">{{ pull_labels }}</span>
             </div>
             <div class="sf-toolbar-info-piece">
                 <b>Author</b>
                 <a href="https://github.com/{{ pull_user }}" target="_blank">
                     <img src="{{ pull_avatar }}" style="position:relative; top: 7px; left: 3px;">
-                    <span class="sf-toolbar-status">{{ pull_user }}</span>
+                    <span class="sf-toolbar-status" style="text-align: left;">{{ pull_user }}</span>
                 </a>
             </div>
         </div>
