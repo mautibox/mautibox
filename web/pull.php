@@ -61,7 +61,7 @@ $build     = [
     'sha'    => '',
     'date'   => '',
     'pull'   => $pullNumber,
-    'status' => 'building',
+    'status' => 'queued',
     'error'  => '',
 ];
 $buildFile = BASE.'/code/data/'.$pullNumber.'/build.json';
