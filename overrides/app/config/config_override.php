@@ -29,7 +29,7 @@ $container->loadFromExtension(
             'pull_request'   => PULL,
             'pull_title'     => !empty($pull_title) ? $pull_title : 'Pull Request',
             'pull_user'      => !empty($pull_user) ? $pull_user : '',
-            'pull_avatar'    => !empty($pull_avatar) ? '<img src="'.$pull_avatar.'">' : '',
+            'pull_avatar'    => !empty($pull_avatar) ? $pull_avatar : '',
         ],
     ]
 );

@@ -50,9 +50,15 @@
         background-color: #4e5d9d;
     }
 </style>
-<script src="/assets/js/build.js" data-source="mautibox"></script>
+<script>{% autoescape 'js' %}//<![CDATA[
+    (function (document, tag) {
+        var scriptTag = document.createElement(tag),
+            firstScriptTag = document.getElementsByTagName(tag)[0];
+        scriptTag.src = '/assets/js/build.js';
+        firstScriptTag.parentNode.insertBefore(scriptTag, firstScriptTag);
+    }(document, 'script'));
+    //]]>{% endautoescape %}</script>
 <div id="sfToolbarClearer-{{ token }}" style="clear: both; height: 36px;"></div>
-
 <div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset clear-fix" data-no-turbolink>
     {% for name, template in templates %}
         {% if block('toolbar', template) is defined %}
@@ -110,7 +116,7 @@
             <div class="sf-toolbar-info-piece">
                 <b>Author</b>
                 <span class="sf-toolbar-status">{{ pull_user }}</span>
-                {{ pull_avatar }}
+                <img src="{{ pull_avatar }}">
             </div>
         </div>
     </div>
