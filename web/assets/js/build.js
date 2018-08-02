@@ -133,7 +133,7 @@
                     if (typeof data.message !== 'undefined' && data.message) {
                         build_overlay_load(data.message);
                     }
-                    timer = setInterval(function () {
+                    timer = setTimeout(function () {
                         $.getJSON('/pull.php?pullNo=' + pullNo, function (data) {
                             // console.log(data);
                             if (typeof data.message !== 'undefined' && data.message) {
@@ -145,8 +145,8 @@
                                 && data.build.status === 'ready'
                             ) {
                                 // Reload the page.
-                                clearInterval(timer);
-                                setTimeout(function() {
+                                clearTimeout(timer);
+                                setTimeout(function () {
                                     data.message = data.message.replace('READY', 'NEARLY THERE');
                                     build_overlay_load(data.message);
                                 }, 1000);
@@ -175,6 +175,7 @@
             }
             // Try again in a while.
             setTimeout(function () {
+                clearTimeout(timer);
                 check_for_build(pullNo);
             }, 60000);
         });
