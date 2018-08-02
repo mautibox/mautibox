@@ -1,9 +1,9 @@
 (function () {
-    if (typeof jQuery !== 'undefined') {
-        let $ = jQuery;
+    if (typeof window.jQuery !== 'undefined') {
+        var $ = window.jQuery;
     }
-    else if (typeof mQuery !== 'undefined') {
-        let $ = mQuery;
+    else if (typeof window.mQuery !== 'undefined') {
+        var $ = window.mQuery;
     }
     else {
         console.warn('No jQuery/mQuery found.');
@@ -28,7 +28,7 @@
     });
 
     var sad = false;
-    let build_overlay_sad = function () {
+    var build_overlay_sad = function () {
         // console.warn(':(');
         sad = true;
         let $overlay = $('body:first,html:first').first().find('#build-overlay');
@@ -38,7 +38,7 @@
         }
     };
 
-    let build_overlay_load = function (message) {
+    var build_overlay_load = function (message) {
         let $target = $('body:first,html:first').first();
         let $overlay = $target.find('#build-overlay');
         let styles = $('#build-styles:first');
@@ -117,7 +117,7 @@
     };
 
     var timer;
-    let check_for_build = function (pullNo) {
+    var check_for_build = function (pullNo) {
         $.getJSON('/pull.php?pullNo=' + pullNo, function (data) {
             console.log(data);
             window.data = data;
@@ -161,7 +161,7 @@
             }, 60000);
         });
     };
-    let check_for_completion = function (pullNo) {
+    var check_for_completion = function (pullNo) {
         $.getJSON('/pull.php?pullNo=' + pullNo, function (data) {
             // console.log(data);
             if (typeof data.message !== 'undefined' && data.message) {
@@ -185,9 +185,9 @@
     };
 
     // Discern the PR number and get details.
-    let parts = window.location.pathname.split('/');
+    var parts = window.location.pathname.split('/');
     if (typeof parts[1] !== 'undefined') {
-        let pullNo = parseInt(parts[1]);
+        var pullNo = parseInt(parts[1]);
         if (pullNo) {
             check_for_build(pullNo);
         }
