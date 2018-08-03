@@ -258,7 +258,7 @@ else
         if [ ! -z "$OLDPATCH" ]
         then
             echo "Reverting previous patch"
-            git apply --whitespace=nowarn --verbose - "$PATCH"
+            git apply --whitespace=nowarn --verbose -R "$PATCH"
             if [ $? -ne 0 ]
             then
                 status 'error' 'Previous patch could not be reverted cleanly.'
