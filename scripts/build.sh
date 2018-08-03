@@ -255,13 +255,25 @@ else
     if [ "$OLDPATCH" != "$NEWPATCH" ]
     then
         unlink
+        if [ ! -z "$OLDPATCH" ]
+        then
+            echo "Reverting previous patch"
+            git apply --whitespace=nowarn --verbose - "$PATCH"
+            if [ $? -ne 0 ]
+            then
+                status 'error' 'Previous patch could not be reverted cleanly. Rebuild queued.'
+                rm -rf cd "$WEB"
+                exit 1
+            fi
+        fi
         cp "$PATCH.latest" "$PATCH"
         rm -f "$PATCH.latest"
         cd "$PULL"
         git apply --whitespace=nowarn --verbose "$PATCH"
         if [ $? -ne 0 ]
         then
-            status 'error' 'Patch could not be applied cleanly.'
+            status 'error' 'Patch could not be applied cleanly. Rebuild queued.'
+            rm -rf cd "$WEB"
             exit 1
         fi
         CHANGES=1
