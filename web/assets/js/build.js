@@ -119,7 +119,7 @@
     var timer;
     var check_for_build = function (pullNo) {
         $.getJSON('/pull.php?pullNo=' + pullNo, function (data) {
-            console.log(data);
+            // console.log(data);
             window.data = data;
             if (typeof data.error === 'undefined') {
                 console.error('Something has gone wrong with the pull script.', data);
@@ -152,7 +152,10 @@
                 if (typeof data.message !== 'undefined' && data.message) {
                     build_overlay_load(data.message);
                 }
-                build_overlay_sad();
+                setTimeout(function () {
+                    build_overlay_sad();
+                }, 300);
+                console.warn(data);
             }
             // Try again in a while.
             setTimeout(function () {
@@ -190,7 +193,8 @@
         var pullNo = parseInt(parts[1]);
         if (pullNo) {
             check_for_build(pullNo);
-        } else {
+        }
+        else {
             build_overlay_load('<h1>GREETINGS HUMAN</h1><h4>There is a problem is between your keyboard and chair. Please try a pull request number.</h4>');
             build_overlay_sad();
         }
