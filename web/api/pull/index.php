@@ -110,13 +110,13 @@ if (!$cached) {
     } catch (\Exception $exception) {
         throwError('Pull request is not valid. Github says "'.$exception->getMessage().'"');
     }
-    if ($pull['merged'] == true) {
+    if ($pull['merged'] === true) {
         throwError('This pull request is already merged :O');
     }
     if ($pull['state'] !== 'open') {
         throwError('Pull request must be open.');
     }
-    if ($pull['mergeable'] == false) {
+    if ($pull['mergeable'] === false) {
         throwError(
             'This pull request cannot be tested. Standard checks must pass and conflicts must be resolved first.'
         );
