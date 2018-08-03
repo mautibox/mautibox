@@ -235,7 +235,9 @@ else
 
     # Check if a patch is needed or has already been applied.
     mkdir -p "$PATCHDIR"
-    sudo curl -sfL "$REPO/pull/$1.patch" --output "$PATCH.latest"
+    # sudo curl -sfL "$REPO/pull/$1.patch" --output "$PATCH.latest"
+    # Diffs are more lenient.
+    sudo curl -sfL "$REPO/pull/$1.diff" --output "$PATCH.latest"
     if [ $? -ne 0 ]
     then
         unlink
