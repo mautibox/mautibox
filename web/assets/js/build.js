@@ -121,7 +121,7 @@
 
     var timer;
     var check_for_build = function (pullNo) {
-        $.getJSON('/api/pull?pullNo=' + pullNo, function (data) {
+        $.getJSON('/api/pull/?pullNo=' + pullNo, function (data) {
             if (typeof data.error === 'undefined') {
                 console.error('Something has gone wrong with the pull script.', data);
                 return;
@@ -167,7 +167,7 @@
         });
     };
     var check_for_completion = function (pullNo) {
-        $.getJSON('/api/pull?pullNo=' + pullNo, function (data) {
+        $.getJSON('/api/pull/?pullNo=' + pullNo, function (data) {
             // console.log(data);
             if (typeof data.message !== 'undefined' && data.message) {
                 build_overlay_load(data.message, pullNo);
