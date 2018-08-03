@@ -235,7 +235,7 @@ else
 
     # Check if a patch is needed or has already been applied.
     mkdir -p "$PATCHDIR"
-    curl -sfL "$REPO/pull/$1.patch" --output "$PATCH.latest"
+    sudo curl -sfL "$REPO/pull/$1.patch" --output "$PATCH.latest"
     if [ $? -ne 0 ]
     then
         unlink
@@ -258,7 +258,7 @@ else
         if [ ! -z "$OLDPATCH" ]
         then
             echo "Reverting previous patch"
-            git apply --whitespace=nowarn --verbose -R "$PATCH"
+            sudo git apply --whitespace=nowarn --verbose -R "$PATCH"
             if [ $? -ne 0 ]
             then
                 status 'error' 'Previous patch could not be reverted cleanly.'
@@ -269,7 +269,7 @@ else
         cp "$PATCH.latest" "$PATCH"
         rm -f "$PATCH.latest"
         cd "$PULL"
-        git apply --whitespace=nowarn --verbose "$PATCH"
+        sudo git apply --whitespace=nowarn --verbose "$PATCH"
         if [ $? -ne 0 ]
         then
             status 'error' 'Patch could not be applied cleanly.'
