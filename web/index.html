@@ -5,53 +5,56 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <meta name="description" content="Mautibox is a free sandbox for testing open source marketing automation Mautic">
-
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-        <link rel="manifest" href="/site.webmanifest">
-        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#4e5e9e">
-        <link rel="shortcut icon" href="/favicon.ico">
-        <meta name="msapplication-TileColor" content="#4e5e9e">
-        <meta name="msapplication-config" content="/browserconfig.xml">
-        <meta name="theme-color" content="#4e5e9e">
-
-        <!--<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Work+Sans:200,300,400,700">-->
-        <link rel="stylesheet" href="assets/js/libs/materialize/css/materialize.min.css">
-        <link rel="stylesheet" href="assets/js/libs/textillate/assets/animate.css">
-        <link rel="stylesheet" href="assets/css/linea.min.css">
-        <link rel="stylesheet" href="assets/css/nas.min.css?v=2">
+        <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+        <link rel="manifest" href="/assets/favicon/site.webmanifest">
+        <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#4e5e9e">
+        <link rel="shortcut icon" href="/assets/favicon/favicon.ico">
+        <meta name="apple-mobile-web-app-title" content="Mautibox">
+        <meta name="application-name" content="Mautibox">
+        <meta name="msapplication-TileColor" content="#00aba9">
+        <meta name="msapplication-config" content="/assets/favicon/browserconfig.xml">
+        <meta name="theme-color" content="#ffffff">
+        <link rel="stylesheet" href="/assets/js/libs/materialize/css/materialize.min.css">
+        <link rel="stylesheet" href="/assets/js/libs/textillate/assets/animate.css">
+        <link rel="stylesheet" href="/assets/js/libs/chosen/chosen.min.css">
+        <link rel="stylesheet" href="/assets/css/nas.css">
         <meta name="theme-color" content="#ffffff">
         <title>Mautibox</title>
     </head>
     <body>
-        <div class="loading-overlay" id="loading-overlay"></div>
-        <div class="pace" id="pace">
-            <div class="pace-activity"></div>
-        </div>
-        <!-- Main content-->
         <main class="main" id="main">
             <div class="triangles hero" id="triangles">
                 <div id="output"></div>
-                <h1>---</h1>
+                <h1>
+                    Let's Test Mautic
+                    <form action="#">
+                        <select id="pull-selector" data-placeholder="Select a request..." placeholder="Select a request..." tabindex="1">
+                            <option value=""></option>
+                        </select>
+                        <input type="submit" id="lets-go" class="btn btn-large" value="Let's Go!" style="display:none;">
+                    </form>
+                </h1>
             </div>
-
             <section class="section scrollspy">
                 <div class="container">
                     <div class="row">
                         <div class="col s12 l6">
                             <h2>Mautibox</h2>
-                            <h3>Test the latest Pull Requests</h3>
+                            <h3>What is this thing?</h3>
                         </div>
                         <div class="col s12 l6">
-                            <p class="flow-text"></p>
+                            <p class="flow-text">
+                                A sandbox for testing the open marketing automation software <a href="https://mautic.org">Mautic</a>.
+                                New features and fixes can be tested here by humans (like you, probably).
+                                To begin, just select what you wish to test above.
+                            </p>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
-        <!-- Footer-->
-
         <footer>
             <div class="container">
                 <div class="row">
@@ -63,16 +66,12 @@
                 </div>
             </div>
         </footer>
-        <!-- Libraries-->
-        <script src="assets/js/libs/jquery/jquery.min.js"></script>
-        <!--<script src="./libs/materialize/js/materialize.min.js"></script>-->
-        <!--<script src="./libs/textillate/jquery.textillate.js"></script>-->
-        <!--<script src="./libs/textillate/assets/jquery.lettering.js"></script>-->
-        <!--<script src="./libs/textillate/assets/jquery.fittext.js"></script>-->
-        <!-- Nas scripts-->
-        <script src="assets/js/config.js"></script>
-        <script src="assets/js/nas.js"></script>
-        <script src="assets/js/libs/flat-surface-shader/deploy/fss.js"></script>
-        <script src="assets/js/triangles-i.js"></script>
+        <script src="/assets/js/libs/jquery/jquery.min.js"></script>
+        <script src="/assets/js/config.js"></script>
+        <!--<script src="/assets/js/nas.js"></script>-->
+        <script src="/assets/js/libs/flat-surface-shader/deploy/fss.js"></script>
+        <script src="/assets/js/triangles-i.js"></script>
+        <script src="/assets/js/libs/chosen/chosen.jquery.min.js"></script>
+        <script src="/assets/js/pulls.js"></script>
     </body>
 </html>

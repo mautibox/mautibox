@@ -190,6 +190,9 @@
         var pullNo = parseInt(parts[1]);
         if (pullNo) {
             check_for_build(pullNo);
+        } else {
+            build_overlay_load('<h1>GREETINGS HUMAN</h1><h4>There is a problem is between your keyboard and chair. Please try a pull request number.</h4>');
+            build_overlay_sad();
         }
     }
 })();
