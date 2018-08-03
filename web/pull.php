@@ -129,7 +129,12 @@ if (!$cached) {
     }
     $pool->set($key, $cached, $ttl);
 }
-
+// Get the build logs if pertinent.
+$logs    = [];
+$logFile = BASE.'/code/data/'.$pullNumber.'/build.log';
+if (is_file($logFile)) {
+    $logs = tailCustom($logFile, 100);
+}
 // Get the build status (if available) and merge it with the PR output.
 $build     = [
     'sha'    => '',
@@ -146,11 +151,6 @@ if (is_file($buildFile)) {
             throwError($build['error']);
         }
     }
-}
-$logs    = '';
-$logFile = BASE.'/code/data/'.$pullNumber.'/build.log';
-if (is_file($logFile)) {
-    $logs = tailCustom($logFile, 100);
 }
 if (!empty($pull) && is_dir(BASE.'/code/data/'.$pullNumber)) {
     $pullFile = BASE.'/code/data/'.$pullNumber.'/pull.json';
