@@ -119,13 +119,10 @@
     var timer;
     var check_for_build = function (pullNo) {
         $.getJSON('/pull.php?pullNo=' + pullNo, function (data) {
-            // console.log(data);
-            window.data = data;
             if (typeof data.error === 'undefined') {
                 console.error('Something has gone wrong with the pull script.', data);
                 return;
             }
-
             if (data.error === null) {
                 // All is well.
                 sad = false;
@@ -149,14 +146,12 @@
             }
             else {
                 // Error.
+                console.log(data);
                 clearInterval(timer);
+                build_overlay_sad();
                 if (typeof data.message !== 'undefined' && data.message) {
                     build_overlay_load(data.message);
                 }
-                setTimeout(function () {
-                    build_overlay_sad();
-                }, 500);
-                console.log(data);
             }
             // Try again in a while.
             setTimeout(function () {
