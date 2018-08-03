@@ -222,6 +222,7 @@ else
     fi
     if [ "$NEWSHA" != "$SHA" ]
     then
+        unlink
         echo "Syncing pull request workspace."
         sudo rsync -aLrWq --delete --force $STAGE/ $PULL
         if [ $? -ne 0 ]
@@ -230,7 +231,6 @@ else
             exit 1
         fi
         CHANGES=1
-        unlink
     fi
 
     # Check if a patch is needed or has already been applied.
@@ -238,6 +238,7 @@ else
     curl -sfL "$REPO/pull/$1.patch" --output "$PATCH.latest"
     if [ $? -ne 0 ]
     then
+        unlink
         status 'error' 'Patch could not be downloaded.'
         exit 1
     fi
@@ -253,6 +254,7 @@ else
     fi
     if [ "$OLDPATCH" != "$NEWPATCH" ]
     then
+        unlink
         cp "$PATCH.latest" "$PATCH"
         rm -f "$PATCH.latest"
         cd "$PULL"
@@ -263,7 +265,6 @@ else
             exit 1
         fi
         CHANGES=1
-        unlink
     else
         rm -f "$PATCH.latest"
     fi
@@ -311,6 +312,7 @@ else
     fi
     if [ $? -ne 0 ]
     then
+        unlink
         status 'error' 'DB Could not be prepared.'
         exit 1
     fi
