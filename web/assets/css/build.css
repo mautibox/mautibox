@@ -97,7 +97,8 @@ html {
     width: 100%;
     opacity: 0;
     filter: alpha(opacity=0);
-    z-index: 2147483647;
+    /*z-index: 2147483647; too much for the zendeskm*/
+    z-index: 12483639;
 }
 
 #build-overlay #build-overlay-bg {
