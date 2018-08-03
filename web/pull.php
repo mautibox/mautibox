@@ -6,9 +6,11 @@ error_reporting(E_ALL);
 /**
  * Slightly modified version of http://www.geekality.net/2011/05/28/php-tail-tackling-large-files/
  *
- * @author  Torleif Berger, Lorenzo Stanco
- * @link    http://stackoverflow.com/a/15025877/995958
- * @license http://creativecommons.org/licenses/by/3.0/
+ * @param      $filepath
+ * @param int  $lines
+ * @param bool $adaptive
+ *
+ * @return bool|string
  */
 function tailCustom($filepath, $lines = 1, $adaptive = true)
 {
@@ -129,12 +131,16 @@ if (!$cached) {
     }
     $pool->set($key, $cached, $ttl);
 }
+
 // Get the build logs if pertinent.
-$logs    = [];
+$logs    = '';
 $logFile = BASE.'/code/data/'.$pullNumber.'/build.log';
 if (is_file($logFile)) {
     $logs = tailCustom($logFile, 100);
+} else {
+    $logs = 'No log file found at '.$logFile;
 }
+
 // Get the build status (if available) and merge it with the PR output.
 $build     = [
     'sha'    => '',
@@ -152,6 +158,8 @@ if (is_file($buildFile)) {
         }
     }
 }
+
+// Store the pull request in a file for permanent use by Mautic.
 if (!empty($pull) && is_dir(BASE.'/code/data/'.$pullNumber)) {
     $pullFile = BASE.'/code/data/'.$pullNumber.'/pull.json';
     if (!is_file($pullFile) || time() - filemtime($pullFile) > (5 * 60 * 60)) {
@@ -159,6 +167,7 @@ if (!empty($pull) && is_dir(BASE.'/code/data/'.$pullNumber)) {
     }
 }
 
+// If we have an error with the build, now is the time to throw it.
 if ($build['status'] == 'error') {
     throwError($build['error']);
 }
@@ -184,7 +193,7 @@ function throwError($error)
             'message' => !empty($message) ? $message : $error,
             'pull'    => !empty($pull) ? $pull : [],
             'build'   => !empty($build) ? $build : [],
-            'logs'    => !empty($logs) ? $logs : [],
+            'logs'    => !empty($logs) ? $logs : '',
         ]
     );
 }
