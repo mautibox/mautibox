@@ -187,6 +187,7 @@ outputResult(
 
 function throwError($error)
 {
+    global $pull, $message, $build, $logs;
     outputResult(
         [
             'error'   => $error,
