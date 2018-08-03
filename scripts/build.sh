@@ -261,8 +261,8 @@ else
             git apply --whitespace=nowarn --verbose - "$PATCH"
             if [ $? -ne 0 ]
             then
-                status 'error' 'Previous patch could not be reverted cleanly. Rebuild queued.'
-                rm -rf cd "$WEB"
+                status 'error' 'Previous patch could not be reverted cleanly.'
+                rm -rf "$PULL"
                 exit 1
             fi
         fi
@@ -272,8 +272,8 @@ else
         git apply --whitespace=nowarn --verbose "$PATCH"
         if [ $? -ne 0 ]
         then
-            status 'error' 'Patch could not be applied cleanly. Rebuild queued.'
-            rm -rf cd "$WEB"
+            status 'error' 'Patch could not be applied cleanly.'
+            rm -rf "$PULL"
             exit 1
         fi
         CHANGES=1
