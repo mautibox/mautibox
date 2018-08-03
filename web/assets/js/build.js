@@ -50,7 +50,7 @@
             // Define markup
             let html = '<div id="build-overlay">' +
                 '<div id="build-overlay-bg">' +
-                '<img src="http://i.imgur.com/S3LuSg1.gif" class="build-overlay-spinner">' +
+                '<img src="/assets/img/spinner.gif" class="build-overlay-spinner">' +
                 '<div id="build-overlay-progressbar">' +
                 '<div id="build-overlay-progressbar-inner"></div>' +
                 '</div>' +
