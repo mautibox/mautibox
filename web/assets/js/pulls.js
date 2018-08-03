@@ -2,7 +2,7 @@
     $(document).ready(function () {
         let $target = $('#pull-selector:first');
         if ($target.length) {
-            $.getJSON('/pulls.php', function (data) {
+            $.getJSON('/api/pulls', function (data) {
                 console.log(data);
                 if (typeof data.pulls !== 'undefined' || !data.pulls.length) {
                     // $target.parent().fadeTo(0, 0);

@@ -12,6 +12,9 @@
 !/web/assets
 !/web/assets/*
 !/web/assets/**/*
+!/web/api
+!/web/api/*
+!/web/api/**/*
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml

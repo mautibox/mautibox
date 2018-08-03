@@ -78,9 +78,9 @@ function tailCustom($filepath, $lines = 1, $adaptive = true)
 
 }
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__.'/../../../vendor/autoload.php';
 
-define('BASE', realpath(__DIR__.'/../'));
+define('BASE', realpath(__DIR__.'/../../../'));
 $error      = null;
 $message    = null;
 $pullNumber = !empty($_GET['pullNo']) ? (int) $_GET['pullNo'] : null;

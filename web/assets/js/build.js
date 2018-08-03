@@ -34,11 +34,12 @@
         let $overlay = $('body:first,html:first').first().find('#build-overlay');
         if ($overlay && $overlay.length) {
             $overlay.removeClass('build-overlay-loaded');
-            $overlay.find('#build-overlay-progressbar-inner').hide();
+            $overlay.find('#build-overlay-progressbar-inner').stop().fadeTo(100, 0);
+            $overlay.find('#build-overlay-message-links').stop().fadeTo(500, 1);
         }
     };
 
-    var build_overlay_load = function (message) {
+    var build_overlay_load = function (message, pullNo) {
         let $target = $('body:first,html:first').first();
         let $overlay = $target.find('#build-overlay');
         let styles = $('#build-styles:first');
@@ -55,6 +56,8 @@
                 '</div>' +
                 '</div>' +
                 '<p id="build-overlay-message"></p>' +
+                '<p id="build-overlay-message-links">' +
+                '<a href="/">&larr; <span>Go back</span> and try another</a> or <a href="https://github.com/mautic/mautic/pull/' + pullNo + '">help with the <span>Pull Request</span> &rarr;</a></p>' +
                 '</div>';
 
             // Create the overlay
@@ -118,7 +121,7 @@
 
     var timer;
     var check_for_build = function (pullNo) {
-        $.getJSON('/pull.php?pullNo=' + pullNo, function (data) {
+        $.getJSON('/api/pull?pullNo=' + pullNo, function (data) {
             if (typeof data.error === 'undefined') {
                 console.error('Something has gone wrong with the pull script.', data);
                 return;
@@ -128,7 +131,7 @@
                 sad = false;
                 if (data.build.status === 'building' || data.build.status === 'queued' || data.build.status === 'warming') {
                     if (typeof data.message !== 'undefined' && data.message) {
-                        build_overlay_load(data.message);
+                        build_overlay_load(data.message, pullNo);
                     }
                     timer = setInterval(function () {
                         check_for_completion(pullNo);
@@ -150,8 +153,11 @@
                 clearInterval(timer);
                 build_overlay_sad();
                 if (typeof data.message !== 'undefined' && data.message) {
-                    build_overlay_load(data.message);
+                    build_overlay_load(data.message, pullNo);
                 }
+                setTimeout(function () {
+                    build_overlay_sad();
+                }, 1000);
             }
             // Try again in a while.
             setTimeout(function () {
@@ -161,10 +167,10 @@
         });
     };
     var check_for_completion = function (pullNo) {
-        $.getJSON('/pull.php?pullNo=' + pullNo, function (data) {
+        $.getJSON('/api/pull?pullNo=' + pullNo, function (data) {
             // console.log(data);
             if (typeof data.message !== 'undefined' && data.message) {
-                build_overlay_load(data.message);
+                build_overlay_load(data.message, pullNo);
             }
             if (
                 typeof data.error !== 'undefined'
@@ -175,7 +181,7 @@
                 clearInterval(timer);
                 setTimeout(function () {
                     data.message = data.message.replace('READY', 'LOADING');
-                    build_overlay_load(data.message);
+                    build_overlay_load(data.message, pullNo);
                 }, 1000);
                 window.location.reload();
                 return false;

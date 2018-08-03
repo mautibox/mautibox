@@ -51,15 +51,15 @@ html {
 }
 
 /*@-webkit-keyframes colorpulse {*/
-    /*0% {*/
-        /*background-color: #4e5e9e;*/
-    /*}*/
-    /*50% {*/
-        /*background-color: #ffffff;*/
-    /*}*/
-    /*100% {*/
-        /*background-color: #4e5e9e;*/
-    /*}*/
+/*0% {*/
+/*background-color: #4e5e9e;*/
+/*}*/
+/*50% {*/
+/*background-color: #ffffff;*/
+/*}*/
+/*100% {*/
+/*background-color: #4e5e9e;*/
+/*}*/
 /*}*/
 
 @-webkit-keyframes hue {
@@ -77,10 +77,8 @@ html {
     }
 }
 
-#build-overlay * {
-    /* css reset to go here */
+#build-overlay img {
     pointer-events: none;
-
 }
 
 #build-overlay,
@@ -124,11 +122,17 @@ html {
     /*-webkit-filter: grayscale(100%);*/
 }
 
+#build-overlay #build-overlay-message-links a,
 #build-overlay #build-overlay-message a {
     color: #cecece;
     text-decoration: none;
 }
 
+#build-overlay #build-overlay-message-links a span {
+    text-decoration: underline;
+}
+
+#build-overlay #build-overlay-message-links,
 #build-overlay #build-overlay-message {
     font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
     color: #cecece;
@@ -146,8 +150,13 @@ html {
     z-index: 2147483647;
 }
 
+#build-overlay #build-overlay-message-links {
+    top: 80%;
+    font-size: 1rem;
+}
+
 /*#build-overlay.build-overlay-loaded #build-overlay-progressbar-inner {*/
-    /*-webkit-animation: hue 30s infinite ease-in-out;*/
+/*-webkit-animation: hue 30s infinite ease-in-out;*/
 /*}*/
 
 #build-overlay.build-overlay-loaded #build-overlay-bg {
