@@ -174,11 +174,6 @@ if (!empty($pull) && is_dir(BASE.'/code/data/'.$pullNumber)) {
     }
 }
 
-// If we have an error with the build, now is the time to throw it.
-if ($build['status'] == 'error') {
-    throwError($build['error']);
-}
-
 // An arbitrary "size" of this pull request for visualization.
 // $size = $pull['comments'] + $pull['review_comments'] + $pull['commits'] + $pull['additions'] + $pull['deletions'] + $pull['changed_files'];
 
@@ -214,9 +209,6 @@ function outputResult($array)
         if (!empty($array['build']['error'])) {
             $array['message'] .= '<h4>'.$array['build']['error'].'</h4>';
         }
-    }
-    if (!empty($array['error'])) {
-        $array['message'] = '<h1>ERROR</h1><h4>'.$array['message'].'</h4>';
     }
 
     if (!empty($array['pull']['title'])) {
