@@ -157,7 +157,7 @@ $buildFile = BASE.'/code/data/'.$pullNumber.'/build.json';
 if (is_file($buildFile)) {
     if ($buildStatus = file_get_contents($buildFile)) {
         $buildArray = json_decode($buildStatus, true);
-        if ($buildArray) {
+        if (!empty($buildArray)) {
             $build = $buildArray;
             if (!empty($build['error'])) {
                 throwError($build['error']);

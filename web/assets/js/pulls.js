@@ -3,8 +3,8 @@
         let $target = $('#pull-selector:first');
         if ($target.length) {
             $.getJSON('/api/pulls/', function (data) {
-                console.log(data);
-                $target.append('<option value="staging">Latest version (staging)</option>');
+                // console.log(data);
+                // $target.append('<option value="staging">Latest version (staging)</option>');
                 if (typeof data.pulls !== 'undefined' || !data.pulls.length) {
                     // $target.parent().fadeTo(0, 0);
                     $.each(data.pulls, function (pullNo, pull) {
