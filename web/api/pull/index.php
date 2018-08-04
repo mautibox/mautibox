@@ -71,6 +71,7 @@ function tailCustom($filepath, $lines = 1, $adaptive = true)
     }
     // Close file and return
     fclose($f);
+
     return trim($output);
 
 }
@@ -105,39 +106,46 @@ $build = [
 
 $cached = $pool->get($key);
 $pull   = [];
-if (!$cached && $pullNumber !== 'staging') {
-    $client = new Github\Client();
-    $pager  = new Github\ResultPager($client);
-    $client->addCache($pool, ['default_ttl' => $ttl]);
-    $client->authenticate(getenv('GH_TOKEN'), null, Github\Client::AUTH_HTTP_TOKEN);
+if ($pullNumber === 'staging') {
+    $queueFile = BASE.'/queue/'.$pullNumber.'.pull';
+    if (!is_file($queueFile)) {
+        file_put_contents($queueFile, time());
+    }
+} else {
+    if (!$cached) {
+        $client = new Github\Client();
+        $pager  = new Github\ResultPager($client);
+        $client->addCache($pool, ['default_ttl' => $ttl]);
+        $client->authenticate(getenv('GH_TOKEN'), null, Github\Client::AUTH_HTTP_TOKEN);
 
-    // Get all open PRs sorted by popularity.
-    $repoApi = $client->api('pullRequest');
-    try {
-        $pull = $pager->fetch($repoApi, 'show', ['mautic', 'mautic', $pullNumber]);
-    } catch (\Exception $exception) {
-        throwError('Pull request is not valid. Github says "'.$exception->getMessage().'"');
-    }
-    if ($pull['merged'] === true) {
-        throwError('This pull request is already merged :O');
-    }
-    if ($pull['state'] !== 'open') {
-        throwError('Pull request must be open.');
-    }
-    if ($pull['mergeable'] === false) {
-        throwError(
-            'This pull request cannot be tested. Standard checks must pass and conflicts must be resolved first.'
-        );
-    }
-
-    # Add this pull to the queue to be checked/updated/installed
-    if ($cached !== $pull) {
-        $queueFile = BASE.'/queue/'.$pullNumber.'.pull';
-        if (!is_file($queueFile)) {
-            file_put_contents($queueFile, time());
+        // Get all open PRs sorted by popularity.
+        $repoApi = $client->api('pullRequest');
+        try {
+            $pull = $pager->fetch($repoApi, 'show', ['mautic', 'mautic', $pullNumber]);
+        } catch (\Exception $exception) {
+            throwError('Pull request is not valid. Github says "'.$exception->getMessage().'"');
         }
+        if ($pull['merged'] === true) {
+            throwError('This pull request is already merged :O');
+        }
+        if ($pull['state'] !== 'open') {
+            throwError('Pull request must be open.');
+        }
+        if ($pull['mergeable'] === false) {
+            throwError(
+                'This pull request cannot be tested. Standard checks must pass and conflicts must be resolved first.'
+            );
+        }
+
+        # Add this pull to the queue to be checked/updated/installed
+        if ($cached !== $pull) {
+            $queueFile = BASE.'/queue/'.$pullNumber.'.pull';
+            if (!is_file($queueFile)) {
+                file_put_contents($queueFile, time());
+            }
+        }
+        $pool->set($key, $cached, $ttl);
     }
-    $pool->set($key, $cached, $ttl);
 }
 
 // Get the build logs if pertinent.
@@ -176,10 +184,10 @@ if (!empty($pull) && is_dir(BASE.'/code/data/'.$pullNumber)) {
 
 outputResult(
     [
-        'error'   => $error,
-        'pull'    => $pull,
-        'build'   => $build,
-        'logs'    => $logs,
+        'error' => $error,
+        'pull'  => $pull,
+        'build' => $build,
+        'logs'  => $logs,
     ]
 );
 
@@ -188,10 +196,10 @@ function throwError($error)
     global $pull, $message, $build, $logs;
     outputResult(
         [
-            'error'   => $error,
-            'pull'    => !empty($pull) ? $pull : [],
-            'build'   => !empty($build) ? $build : [],
-            'logs'    => !empty($logs) ? $logs : '',
+            'error' => $error,
+            'pull'  => !empty($pull) ? $pull : [],
+            'build' => !empty($build) ? $build : [],
+            'logs'  => !empty($logs) ? $logs : '',
         ]
     );
 }
