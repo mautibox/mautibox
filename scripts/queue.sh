@@ -61,5 +61,5 @@ do
 
         sudo nohup bash -c "$BASEDIR/scripts/build.sh $PULLNO | while IFS= read -r l; do echo \"[\$(date '+%Y-%m-%d %H:%M:%S')] \$l\"; done >> \"$DATA/build.log\"" >/dev/null 2>&1 &
     done
-    sleep 1
+    sleep .5
 done

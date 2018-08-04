@@ -161,8 +161,8 @@
                 }, 1000);
             }
             // Try again in a while.
+            clearInterval(timer);
             setTimeout(function () {
-                clearInterval(timer);
                 check_for_build(pullNo);
             }, 60000);
         });

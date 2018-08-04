@@ -159,9 +159,9 @@ if (is_file($buildFile)) {
         $buildArray = json_decode($buildStatus, true);
         if ($buildArray) {
             $build = $buildArray;
-        }
-        if (!empty($build['error'])) {
-            throwError($build['error']);
+            if (!empty($build['error'])) {
+                throwError($build['error']);
+            }
         }
     }
 }

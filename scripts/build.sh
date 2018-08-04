@@ -285,7 +285,7 @@ else
         CHANGES=1
     fi
 
-    if [ "$PULLNO" -ne "staging" ]
+    if [ "$PULLNO" != "staging" ]
     then
         patch
     fi
