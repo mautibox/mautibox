@@ -174,7 +174,7 @@ function dataprep {
     fi
 }
 
-function patch {
+function applypatch {
     # Check if a patch is needed or has already been applied.
     mkdir -p "$PATCHDIR"
     # sudo curl -sfL "$REPO/pull/$1.patch" --output "$PATCH.latest"
@@ -287,7 +287,7 @@ else
 
     if [ "$PULLNO" != "staging" ]
     then
-        patch
+        applypatch
     fi
 
     # If there were no changes, end.
