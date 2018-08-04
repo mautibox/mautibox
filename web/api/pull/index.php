@@ -89,6 +89,9 @@ if (!$pullNumber) {
     $pullNumber = !empty($urlParts[0]) && is_numeric(trim($urlParts[0])) ? (int) $urlParts[0] : null;
 }
 if (!$pullNumber) {
+    $pullNumber = !empty($_GET['pullNo']) && 'staging' == trim($_GET['pullNo']) ? 'staging' : null;
+}
+if (!$pullNumber) {
     header("HTTP/1.0 404 Not Found");
     die('A pull request number is required.');
 }
@@ -97,7 +100,8 @@ $ttl  = 60;
 $pool = new Cache\Adapter\Apcu\ApcuCachePool();
 
 $cached = $pool->get($key);
-if (!$cached) {
+$pull   = [];
+if (!$cached && $pullNumber !== 'staging') {
     $client = new Github\Client();
     $pager  = new Github\ResultPager($client);
     $client->addCache($pool, ['default_ttl' => $ttl]);

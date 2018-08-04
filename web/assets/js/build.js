@@ -130,6 +130,7 @@
                 // All is well.
                 sad = false;
                 if (data.build.status === 'building' || data.build.status === 'queued' || data.build.status === 'warming') {
+                    window.mautiboxReloadNeeded = true;
                     if (typeof data.message !== 'undefined' && data.message) {
                         build_overlay_load(data.message, pullNo);
                     }
@@ -192,13 +193,17 @@
     // Discern the PR number and get details.
     var parts = window.location.pathname.split('/');
     if (typeof parts[1] !== 'undefined') {
-        var pullNo = parseInt(parts[1]);
-        if (pullNo) {
-            check_for_build(pullNo);
-        }
-        else {
-            build_overlay_load('<h1>GREETINGS HUMAN</h1><h4>There is a problem is between your keyboard and chair. Please try a pull request number.</h4>');
-            build_overlay_sad();
+        if (parts[1] === 'staging') {
+            check_for_build('staging');
+        } else {
+            var pullNo = parseInt(parts[1]);
+            if (pullNo) {
+                check_for_build(pullNo);
+            }
+            else {
+                build_overlay_load('<h1>GREETINGS HUMAN</h1><h4>There is a problem is between your keyboard and chair. Please try a pull request number.</h4>');
+                build_overlay_sad();
+            }
         }
     }
 })();

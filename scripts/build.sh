@@ -32,7 +32,7 @@ then
 fi
 if [ -z "$STAGEFREQUENCY" ]
 then
-    STAGEFREQUENCY=10
+    STAGEFREQUENCY=30
 fi
 
 BASEDIR=$(dirname "$BASH_SOURCE")
@@ -174,6 +174,58 @@ function dataprep {
     fi
 }
 
+function patch {
+    # Check if a patch is needed or has already been applied.
+    mkdir -p "$PATCHDIR"
+    # sudo curl -sfL "$REPO/pull/$1.patch" --output "$PATCH.latest"
+    # Diffs are more lenient.
+    sudo curl -sfL "$REPO/pull/$1.diff" --output "$PATCH.latest"
+    if [ $? -ne 0 ]
+    then
+        unlink
+        status 'error' 'Patch could not be downloaded.'
+        exit 1
+    fi
+    NEWPATCH=$( cat "$PATCH.latest" )
+    if [ -z "$NEWPATCH" ]
+    then
+        status 'error' 'Patch is empty.'
+        exit 1
+    fi
+    if [ -f "$PATCH" ]
+    then
+        OLDPATCH=$( cat "$PATCH" )
+    fi
+    if [ "$OLDPATCH" != "$NEWPATCH" ]
+    then
+        unlink
+        if [ ! -z "$OLDPATCH" ]
+        then
+            echo "Reverting previous patch"
+            sudo git apply --whitespace=nowarn --verbose -R "$PATCH"
+            if [ $? -ne 0 ]
+            then
+                status 'error' 'Previous patch could not be reverted cleanly.'
+                rm -rf "$PULL"
+                exit 1
+            fi
+        fi
+        cp "$PATCH.latest" "$PATCH"
+        rm -f "$PATCH.latest"
+        cd "$PULL"
+        sudo git apply --whitespace=nowarn --verbose "$PATCH"
+        if [ $? -ne 0 ]
+        then
+            status 'error' 'Patch could not be applied cleanly.'
+            rm -rf "$PULL"
+            exit 1
+        fi
+        CHANGES=1
+    else
+        rm -f "$PATCH.latest"
+    fi
+}
+
 if [ ! -z $( find "$PATCH" -mmin -$PULLFREQUENCY 2>/dev/null ) ]
 then
     echo "The PULL is recent enough. Builds permitted every $PULLFREQUENCY minutes."
@@ -233,54 +285,9 @@ else
         CHANGES=1
     fi
 
-    # Check if a patch is needed or has already been applied.
-    mkdir -p "$PATCHDIR"
-    # sudo curl -sfL "$REPO/pull/$1.patch" --output "$PATCH.latest"
-    # Diffs are more lenient.
-    sudo curl -sfL "$REPO/pull/$1.diff" --output "$PATCH.latest"
-    if [ $? -ne 0 ]
+    if [ "$PULLNO" -ne "staging" ]
     then
-        unlink
-        status 'error' 'Patch could not be downloaded.'
-        exit 1
-    fi
-    NEWPATCH=$( cat "$PATCH.latest" )
-    if [ -z "$NEWPATCH" ]
-    then
-        status 'error' 'Patch is empty.'
-        exit 1
-    fi
-    if [ -f "$PATCH" ]
-    then
-        OLDPATCH=$( cat "$PATCH" )
-    fi
-    if [ "$OLDPATCH" != "$NEWPATCH" ]
-    then
-        unlink
-        if [ ! -z "$OLDPATCH" ]
-        then
-            echo "Reverting previous patch"
-            sudo git apply --whitespace=nowarn --verbose -R "$PATCH"
-            if [ $? -ne 0 ]
-            then
-                status 'error' 'Previous patch could not be reverted cleanly.'
-                rm -rf "$PULL"
-                exit 1
-            fi
-        fi
-        cp "$PATCH.latest" "$PATCH"
-        rm -f "$PATCH.latest"
-        cd "$PULL"
-        sudo git apply --whitespace=nowarn --verbose "$PATCH"
-        if [ $? -ne 0 ]
-        then
-            status 'error' 'Patch could not be applied cleanly.'
-            rm -rf "$PULL"
-            exit 1
-        fi
-        CHANGES=1
-    else
-        rm -f "$PATCH.latest"
+        patch
     fi
 
     # If there were no changes, end.
@@ -291,8 +298,6 @@ else
         status 'ready'
         exit 0
     fi
-
-    # Check for css/js changes
 
     # Check for dependency changes.
     if cmp "$STAGE/composer.lock" "$PULL/composer.lock"
