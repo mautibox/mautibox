@@ -28,7 +28,9 @@
     });
 
     var sad = false;
-    var build_overlay_sad = function () {
+    var build_overlay_sad = function (data) {
+        clearTimeout(timer);
+        clearTimeout(retry);
         // console.warn(':(');
         sad = true;
         let $overlay = $('body:first,html:first').first().find('#build-overlay');
@@ -37,6 +39,27 @@
             $overlay.find('#build-overlay-progressbar-inner').stop().fadeTo(100, 0);
             $overlay.find('#build-overlay-message-links').stop().fadeTo(500, 1);
         }
+        // Try again in a while.
+        retry = setTimeout(function () {
+            clearTimeout(timer);
+            check_for_build(pullNo);
+        }, 60000);
+        if (typeof data.message !== 'undefined' && data.message) {
+            build_overlay_load(data.message, pullNo);
+        }
+        // setTimeout(function () {
+        //     build_overlay_sad(data);
+        // }, 1000);
+    };
+    var build_overlay_happy = function (data, pullNo) {
+        clearTimeout(timer);
+        clearTimeout(retry);
+        setTimeout(function () {
+            data.message = data.message.replace('READY', 'LOADING');
+            build_overlay_load(data.message, pullNo);
+        }, 1500);
+        window.location.reload();
+        return false;
     };
 
     var build_overlay_load = function (message, pullNo) {
@@ -136,7 +159,7 @@
                     }
                     timer = setTimeout(function () {
                         check_for_completion(pullNo);
-                    }, 500);
+                    }, 1000);
                 }
                 else if (
                     typeof window.mautiboxReloadNeeded !== 'undefined'
@@ -144,52 +167,39 @@
                     && data.build.status === 'ready'
                 ) {
                     // Reload the page.
-                    clearTimeout(timer);
-                    clearTimeout(retry);
-                    window.location.reload();
-                    return false;
+                    return build_overlay_happy(data, pullNo);
                 }
             }
             else {
                 // Error.
                 console.log(data);
-                clearTimeout(timer);
-                build_overlay_sad();
-                if (typeof data.message !== 'undefined' && data.message) {
-                    build_overlay_load(data.message, pullNo);
-                }
-                setTimeout(function () {
-                    build_overlay_sad();
-                }, 1000);
+                build_overlay_sad(data);
             }
-            // Try again in a while.
-            clearTimeout(retry);
-            retry = setTimeout(function () {
-                clearTimeout(timer);
-                check_for_build(pullNo);
-            }, 60000);
         });
     };
     var check_for_completion = function (pullNo) {
         $.getJSON('/api/pull/?pullNo=' + pullNo, function (data) {
+            clearTimeout(timer);
             // console.log(data);
             if (typeof data.message !== 'undefined' && data.message) {
                 build_overlay_load(data.message, pullNo);
             }
             if (
                 typeof data.error !== 'undefined'
-                && (!data.error || data.error.length === 0)
+                && data.error
+            ) {
+                return build_overlay_sad(data);
+            }
+            else if (
+                typeof data.build.status !== 'undefined'
                 && data.build.status === 'ready'
             ) {
                 // Reload the page.
-                clearTimeout(timer);
-                setTimeout(function () {
-                    data.message = data.message.replace('READY', 'LOADING');
-                    build_overlay_load(data.message, pullNo);
-                }, 1000);
-                window.location.reload();
-                return false;
+                return build_overlay_happy(data, pullNo);
             }
+            timer = setTimeout(function () {
+                check_for_completion(pullNo);
+            }, 500);
         });
     };
 
@@ -198,7 +208,8 @@
     if (typeof parts[1] !== 'undefined') {
         if (parts[1] === 'staging') {
             check_for_build('staging');
-        } else {
+        }
+        else {
             var pullNo = parseInt(parts[1]);
             if (pullNo) {
                 check_for_build(pullNo);

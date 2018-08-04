@@ -193,7 +193,7 @@ outputResult(
 
 function throwError($error)
 {
-    global $pull, $message, $build, $logs;
+    global $pull, $build, $logs;
     outputResult(
         [
             'error' => $error,
@@ -207,6 +207,9 @@ function throwError($error)
 function outputResult($array)
 {
     // Customize the message.
+    if ($array['error']) {
+        $array['build']['status'] = 'error';
+    }
     if (!empty($array['build']['status'])) {
         $array['message'] = '<h1>'.strtoupper($array['build']['status']).'</h1>';
     }
