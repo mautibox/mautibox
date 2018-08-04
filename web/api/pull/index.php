@@ -207,7 +207,7 @@ function outputResult($array)
             '<h4>'.htmlentities(trim(strip_tags($array['pull']['title']))).'</h4></a>';
     }
     if (!empty($array['error'])) {
-        $array['message'] .= '<h4>'.$array['message'].'</h4>';
+        $array['message'] .= '<h4>'.$array['error'].'</h4>';
     }
 
     header("HTTP/1.1 200 OK");
