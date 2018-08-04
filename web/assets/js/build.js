@@ -134,7 +134,7 @@
                     if (typeof data.message !== 'undefined' && data.message) {
                         build_overlay_load(data.message, pullNo);
                     }
-                    timer = setInterval(function () {
+                    timer = setTimeout(function () {
                         check_for_completion(pullNo);
                     }, 500);
                 }
@@ -144,8 +144,8 @@
                     && data.build.status === 'ready'
                 ) {
                     // Reload the page.
-                    clearInterval(timer);
-                    clearInterval(retry);
+                    clearTimeout(timer);
+                    clearTimeout(retry);
                     window.location.reload();
                     return false;
                 }
@@ -153,7 +153,7 @@
             else {
                 // Error.
                 console.log(data);
-                clearInterval(timer);
+                clearTimeout(timer);
                 build_overlay_sad();
                 if (typeof data.message !== 'undefined' && data.message) {
                     build_overlay_load(data.message, pullNo);
@@ -165,7 +165,7 @@
             // Try again in a while.
             clearTimeout(retry);
             retry = setTimeout(function () {
-                clearInterval(timer);
+                clearTimeout(timer);
                 check_for_build(pullNo);
             }, 60000);
         });
@@ -182,7 +182,7 @@
                 && data.build.status === 'ready'
             ) {
                 // Reload the page.
-                clearInterval(timer);
+                clearTimeout(timer);
                 setTimeout(function () {
                     data.message = data.message.replace('READY', 'LOADING');
                     build_overlay_load(data.message, pullNo);
