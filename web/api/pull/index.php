@@ -95,9 +95,16 @@ if (!$pullNumber) {
     header("HTTP/1.0 404 Not Found");
     die('A pull request number is required.');
 }
-$key  = 'mautic_pull_'.$pullNumber;
-$ttl  = 60;
-$pool = new Cache\Adapter\Apcu\ApcuCachePool();
+$key   = 'mautic_pull_'.$pullNumber;
+$ttl   = 60;
+$pool  = new Cache\Adapter\Apcu\ApcuCachePool();
+$build = [
+    'sha'    => '',
+    'date'   => '',
+    'pull'   => $pullNumber,
+    'status' => 'queued',
+    'error'  => '',
+];
 
 $cached = $pool->get($key);
 $pull   = [];
@@ -146,17 +153,13 @@ if (is_file($logFile)) {
 }
 
 // Get the build status (if available) and merge it with the PR output.
-$build     = [
-    'sha'    => '',
-    'date'   => '',
-    'pull'   => $pullNumber,
-    'status' => 'queued',
-    'error'  => '',
-];
 $buildFile = BASE.'/code/data/'.$pullNumber.'/build.json';
 if (is_file($buildFile)) {
     if ($buildStatus = file_get_contents($buildFile)) {
-        $build = json_decode($buildStatus, true);
+        $buildArray = json_decode($buildStatus, true);
+        if ($buildArray) {
+            $build = $buildArray;
+        }
         if (!empty($build['error'])) {
             throwError($build['error']);
         }

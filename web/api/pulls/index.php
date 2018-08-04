@@ -6,27 +6,27 @@ $key        = 'mautic_pulls';
 $ttl        = 300;
 $pool       = new Cache\Adapter\Apcu\ApcuCachePool();
 $simplified = $pool->get($key);
+$simplified = false;
 if (!$simplified) {
+    $simplified            = [];
     $client = new Github\Client();
     $pager  = new Github\ResultPager($client);
     $client->addCache($pool, ['default_ttl' => $ttl]);
     $client->authenticate(getenv('GH_TOKEN'), null, Github\Client::AUTH_HTTP_TOKEN);
 
     // Get all open PRs sorted by popularity.
-    $params     = [
+    $params                = [
         'state'     => 'open',
         'base'      => 'staging',
         'sort'      => 'popularity',
         'direction' => 'desc',
         'per_page'  => 100,
     ];
-    $repoApi    = $client->api('pullRequest');
-    $pulls      = $pager->fetch($repoApi, 'all', ['mautic', 'mautic', $params]);
-    $simplified = [];
+    $repoApi               = $client->api('pullRequest');
+    $pulls                 = $pager->fetch($repoApi, 'all', ['mautic', 'mautic', $params]);
     while (!empty($pulls)) {
         foreach ($pulls as $pull) {
-            $prNumber              = $pull['number'];
-            $simplified[$prNumber] = [
+            $simplified[(string) $pull['number']] = [
                 'title' => $pull['title'],
                 'user'  => !empty($pull['user']['login']) ? $pull['user']['login'] : '',
             ];
@@ -39,10 +39,12 @@ if (!$simplified) {
     $pool->set($key, $simplified, $ttl);
 }
 
-outputResult([
-    'error' => null,
-    'pulls' => $simplified,
-]);
+outputResult(
+    [
+        'error' => null,
+        'pulls' => $simplified,
+    ]
+);
 
 function outputResult($array)
 {

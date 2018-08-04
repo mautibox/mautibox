@@ -4,6 +4,7 @@
         if ($target.length) {
             $.getJSON('/api/pulls/', function (data) {
                 console.log(data);
+                $target.append('<option value="staging">Latest version (staging)</option>');
                 if (typeof data.pulls !== 'undefined' || !data.pulls.length) {
                     // $target.parent().fadeTo(0, 0);
                     $.each(data.pulls, function (pullNo, pull) {
@@ -23,7 +24,7 @@
                         });
                     }
                     $target.change(function () {
-                        var val = parseInt($(this).val());
+                        var val = $(this).val();
                         if (val) {
                             $('#lets-go')
                                 .show();
@@ -31,7 +32,7 @@
                     });
                     $('form').submit(function (event) {
                         event.preventDefault();
-                        var val = parseInt($target.val());
+                        var val = $target.val();
                         if (val) {
                             window.location.href = '/' + val;
                         }
