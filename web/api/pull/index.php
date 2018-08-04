@@ -71,7 +71,6 @@ function tailCustom($filepath, $lines = 1, $adaptive = true)
     }
     // Close file and return
     fclose($f);
-
     return trim($output);
 
 }
@@ -178,7 +177,6 @@ if (!empty($pull) && is_dir(BASE.'/code/data/'.$pullNumber)) {
 outputResult(
     [
         'error'   => $error,
-        'message' => $message,
         'pull'    => $pull,
         'build'   => $build,
         'logs'    => $logs,
@@ -191,7 +189,6 @@ function throwError($error)
     outputResult(
         [
             'error'   => $error,
-            'message' => !empty($message) ? $message : $error,
             'pull'    => !empty($pull) ? $pull : [],
             'build'   => !empty($build) ? $build : [],
             'logs'    => !empty($logs) ? $logs : '',
@@ -204,14 +201,13 @@ function outputResult($array)
     // Customize the message.
     if (!empty($array['build']['status'])) {
         $array['message'] = '<h1>'.strtoupper($array['build']['status']).'</h1>';
-        if (!empty($array['build']['error'])) {
-            $array['message'] .= '<h4>'.$array['build']['error'].'</h4>';
-        }
     }
-
     if (!empty($array['pull']['title'])) {
         $array['message'] .= '<a href="https://github.com/mautic/mautic/pull/'.$array['pull']['number'].'" target="_blank">'.
             '<h4>'.htmlentities(trim(strip_tags($array['pull']['title']))).'</h4></a>';
+    }
+    if (!empty($array['error'])) {
+        $array['message'] .= '<h4>'.$array['message'].'</h4>';
     }
 
     header("HTTP/1.1 200 OK");
