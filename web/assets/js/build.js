@@ -119,7 +119,7 @@
         }
     };
 
-    var timer;
+    var timer, retry;
     var check_for_build = function (pullNo) {
         $.getJSON('/api/pull/?pullNo=' + pullNo, function (data) {
             if (typeof data.error === 'undefined') {
@@ -144,6 +144,8 @@
                     && data.build.status === 'ready'
                 ) {
                     // Reload the page.
+                    clearInterval(timer);
+                    clearInterval(retry);
                     window.location.reload();
                     return false;
                 }
@@ -161,8 +163,9 @@
                 }, 1000);
             }
             // Try again in a while.
-            clearInterval(timer);
-            setTimeout(function () {
+            clearTimeout(retry);
+            retry = setTimeout(function () {
+                clearInterval(timer);
                 check_for_build(pullNo);
             }, 60000);
         });

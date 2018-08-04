@@ -14,7 +14,6 @@ error_reporting(E_ALL);
  */
 function tailCustom($filepath, $lines = 1, $adaptive = true)
 {
-
     // Open file
     $f = @fopen($filepath, "rb");
     if ($f === false) {
@@ -70,7 +69,6 @@ function tailCustom($filepath, $lines = 1, $adaptive = true)
         $output = substr($output, strpos($output, "\n") + 1);
 
     }
-
     // Close file and return
     fclose($f);
 
