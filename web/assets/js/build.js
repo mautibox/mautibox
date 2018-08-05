@@ -33,23 +33,22 @@
         clearTimeout(retry);
         // console.warn(':(');
         sad = true;
-        let $overlay = $('body:first,html:first').first().find('#build-overlay');
-        if ($overlay && $overlay.length) {
-            $overlay.removeClass('build-overlay-loaded');
-            $overlay.find('#build-overlay-progressbar-inner').stop().fadeTo(100, 0);
-            $overlay.find('#build-overlay-message-links').stop().fadeTo(500, 1);
-        }
-        // Try again in a while.
-        retry = setTimeout(function () {
-            clearTimeout(timer);
-            check_for_build(pullNo);
-        }, 60000);
         if (typeof data.message !== 'undefined' && data.message) {
             build_overlay_load(data.message, pullNo);
         }
-        // setTimeout(function () {
-        //     build_overlay_sad(data);
-        // }, 1000);
+        setTimeout(function () {
+            let $overlay = $('body:first,html:first').first().find('#build-overlay');
+            if ($overlay && $overlay.length) {
+                $overlay.removeClass('build-overlay-loaded');
+                $overlay.find('#build-overlay-progressbar-inner').stop().fadeTo(100, 0);
+                $overlay.find('#build-overlay-message-links').stop().fadeTo(500, 1);
+            }
+            // Try again in a while.
+            retry = setTimeout(function () {
+                clearTimeout(timer);
+                check_for_build(pullNo);
+            }, 60000);
+        }, 1000);
     };
     var build_overlay_happy = function (data, pullNo) {
         clearTimeout(timer);
