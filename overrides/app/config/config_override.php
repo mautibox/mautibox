@@ -15,14 +15,14 @@ if (is_file(DATA.'/pull.json')) {
         if (isset($pull['labels'])) {
             $label_names = [];
             foreach ($pull['labels'] as $label) {
-                $label_names[] = $label['name'];
+                $label_names[] = str_replace('%', '', strip_tags($label['name']));
             }
             $pull_labels = implode(', ', $label_names);
         }
-        $pull_title  = strip_tags($pull['title']);
-        $pull_user   = strip_tags($pull['user']['login']);
-        $pull_avatar = strip_tags($pull['user']['avatar_url']);
-        $pull_body   = nl2br(htmlentities(strip_tags($pull['body'])));
+        $pull_title  = str_replace('%', '', strip_tags($pull['title']));
+        $pull_user   = str_replace('%', '', strip_tags($pull['user']['login']));
+        $pull_avatar = str_replace('%', '', strip_tags($pull['user']['avatar_url']));
+        $pull_body   = str_replace('%', '', nl2br(htmlentities(strip_tags($pull['body']))));
     }
 }
 $container->setParameter('kernel.logs_dir', DATA);
