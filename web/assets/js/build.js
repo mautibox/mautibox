@@ -158,7 +158,7 @@
                     }
                     timer = setTimeout(function () {
                         check_for_completion(pullNo);
-                    }, 1000);
+                    }, 500);
                 }
                 else if (
                     typeof window.mautiboxReloadNeeded !== 'undefined'

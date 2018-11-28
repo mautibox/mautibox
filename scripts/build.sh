@@ -87,6 +87,7 @@ function permissions {
 }
 
 function dependencies {
+    cd "$PULL"
     echo "Running composer"
     composer install --no-scripts --no-progress --no-suggest
 }
@@ -312,10 +313,10 @@ else
     fi
 
     # Check for dependency changes.
-    if cmp "$STAGE/composer.lock" "$PULL/composer.lock"
+    if cmp -s "$STAGE/composer.lock" "$PULL/composer.lock"
     then
-        cd "$PULL"
-        echo "Dependency changes detected."
+        echo "Dependency changes detected in lock."
+        status 'composing'
         dependencies
     fi
 
