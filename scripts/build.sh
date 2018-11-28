@@ -273,7 +273,7 @@ else
             if [ ! -z "$OLDPATCH" ]
             then
                 echo "Reverting previous patch"
-                sudo git apply --whitespace=nowarn --verbose -R "$PATCH"
+                sudo git apply --exclude="media/*/app.*" --whitespace=nowarn --verbose -R "$PATCH"
                 if [ $? -ne 0 ]
                 then
                     status 'error' 'Previous patch could not be reverted cleanly, I will have to rebuild.'
@@ -284,7 +284,7 @@ else
             cp "$PATCH.latest" "$PATCH"
             rm -f "$PATCH.latest"
             cd "$PULL"
-            sudo git apply --whitespace=nowarn --ignore-whitespace --inaccurate-eof --verbose "$PATCH"
+            sudo git apply --exclude="media/*/app.*" --whitespace=nowarn --ignore-whitespace --inaccurate-eof --verbose "$PATCH"
             if [ $? -ne 0 ]
             then
                 status 'error' 'Patch could not be applied. Try rebasing the branch for this pull request.'
