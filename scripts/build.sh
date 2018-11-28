@@ -122,9 +122,20 @@ function cachewarm {
     console cache:warmup --no-optional-warmers --env=dev --quiet
 }
 
+function assets {
+    cd "$PULL"
+    echo "Generating assets"
+    if [ -f "$PULL/media/js/app.js" ] || [ -f "$PULL/media/js/app.css" ]
+    then
+        rm -f "$PULL/media/js/app.js"
+        rm -f "$PULL/media/js/app.css"
+        console mautic:assets:generate --env=dev
+    fi
+}
+
 function plugins {
     cd "$PULL"
-    echo "Re/loading plugins and warming cache."
+    echo "Re/loading plugins."
     console mautic:plugins:reload --env=dev
 }
 
@@ -265,7 +276,7 @@ else
                 sudo git apply --whitespace=nowarn --verbose -R "$PATCH"
                 if [ $? -ne 0 ]
                 then
-                    status 'error' 'Previous patch could not be reverted cleanly.'
+                    status 'error' 'Previous patch could not be reverted cleanly, I will have to rebuild.'
                     rm -rf "$PULL"
                     exit 1
                 fi
@@ -273,16 +284,21 @@ else
             cp "$PATCH.latest" "$PATCH"
             rm -f "$PATCH.latest"
             cd "$PULL"
-            sudo git apply --whitespace=nowarn --verbose "$PATCH"
+            sudo git apply --whitespace=nowarn --ignore-whitespace --inaccurate-eof --verbose "$PATCH"
             if [ $? -ne 0 ]
             then
-                status 'error' 'Patch could not be applied cleanly.'
+                status 'error' 'Patch could not be applied. Try rebasing the branch for this pull request.'
                 rm -rf "$PULL"
                 exit 1
             fi
             CHANGES=1
         else
             rm -f "$PATCH.latest"
+        fi
+        if [[ $OLDPATCH == *".js"* ]] || [[ $OLDPATCH == *".css"* ]] || [[ $NEWPATCH == *".js"* ]] || [[ $NEWPATCH == *".css"* ]]
+        then
+            status 'generating'
+            assets
         fi
     fi
 
@@ -315,11 +331,13 @@ else
     echo "$DBCREATE"
     if [[ $DBCREATE == *"Skipped"* ]]
     then
+        status 'migrating'
         echo "Running migrations."
         console doctrine:migrations:migrate --no-interaction --env=dev
         echo "Forcing schema updates."
         console doctrine:schema:update --force --env=dev
     else
+        status 'installing'
         echo "Installing default data."
         console mautic:install:data --force --env=dev
         echo "Setting migration versions."
