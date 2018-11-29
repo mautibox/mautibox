@@ -315,6 +315,8 @@ else
     # Check for dependency changes.
     if cmp -s "$STAGE/composer.lock" "$PULL/composer.lock"
     then
+        echo "No dependency changes."
+    else
         echo "Dependency changes detected in lock."
         status 'composing'
         dependencies
