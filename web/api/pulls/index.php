@@ -39,23 +39,10 @@ if (!$simplified) {
     $pool->set($key, $simplified, $ttl);
 }
 
-// Discern if we are coming from a github issue.
-$suggestion = null;
-if (!empty($_COOKIE['referrer']) && false !== strpos(
-        $_COOKIE['referrer'],
-        'github.com/mautic/mautic/'
-    )) {
-    $parts = explode('/', str_ireplace('https://github.com/mautic/mautic/pull/', '', $_COOKIE['referrer']));
-    if (isset($parts[0]) && is_numeric($parts[0])) {
-        $suggestion = (int) $parts[0];
-    }
-}
-
 outputResult(
     [
         'error'      => null,
         'pulls'      => $simplified,
-        'suggestion' => $suggestion,
     ]
 );
 

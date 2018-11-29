@@ -1,6 +1,20 @@
 <?php
+$suggestion = null;
 if (!empty($_SERVER['HTTP_REFERER'])) {
-    setcookie('referrer', $_SERVER['HTTP_REFERER'], time() + (86400 * 30), '/');
+    $prefix = 'https://github.com/mautic/mautic/pull/';
+    if (!empty($_SERVER['HTTP_REFERER']) && false !== strpos($_SERVER['HTTP_REFERER'], $prefix)) {
+        $parts = explode('/', str_ireplace($prefix, '', $_SERVER['HTTP_REFERER']));
+        if (isset($parts[0]) && is_numeric($parts[0])) {
+            $suggestion = (int) $parts[0];
+        }
+    }
+    if ($suggestion) {
+        setcookie('suggestion', $suggestion, time() + (86400 * 30), '/');
+        header('Location: /'.$suggestion);
+        exit;
+    } elseif (!empty($_COOKIE['suggestion'])) {
+        $suggestion = $_COOKIE['suggestion'];
+    }
 }
 ?><!DOCTYPE html>
 <html lang="en">
@@ -79,6 +93,9 @@ if (!empty($_SERVER['HTTP_REFERER'])) {
         <script src="/assets/js/libs/flat-surface-shader/deploy/fss.js"></script>
         <script src="/assets/js/triangles-i.js"></script>
         <script src="/assets/js/libs/chosen/chosen.jquery.min.js"></script>
+        <script>
+            var suggestion = <?php echo $suggestion; ?>;
+        </script>
         <script src="/assets/js/pulls.js"></script>
         <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
                 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
