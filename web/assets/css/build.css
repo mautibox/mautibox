@@ -185,7 +185,7 @@ html {
     background-color: #00b49d;
 }
 
-form .chosen-container .chosen-results li {
-    padding: 2px 6px;
-    line-height: 23px;
+.chosen-container .chosen-results li {
+    padding: 2px 6px !important;
+    line-height: 23px !important;
 }
