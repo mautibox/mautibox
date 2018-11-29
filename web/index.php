@@ -1,5 +1,5 @@
 <?php
-$suggestion = null;
+$suggestion = 0;
 if (!empty($_SERVER['HTTP_REFERER'])) {
     $prefix = 'https://github.com/mautic/mautic/pull/';
     if (!empty($_SERVER['HTTP_REFERER']) && false !== strpos($_SERVER['HTTP_REFERER'], $prefix)) {
@@ -12,9 +12,10 @@ if (!empty($_SERVER['HTTP_REFERER'])) {
         setcookie('suggestion', $suggestion, time() + (86400 * 30), '/');
         header('Location: /'.$suggestion);
         exit;
-    } elseif (!empty($_COOKIE['suggestion'])) {
-        $suggestion = $_COOKIE['suggestion'];
     }
+}
+if (!$suggestion && !empty($_COOKIE['suggestion'])) {
+    $suggestion = $_COOKIE['suggestion'];
 }
 ?><!DOCTYPE html>
 <html lang="en">
