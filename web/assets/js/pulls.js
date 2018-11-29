@@ -9,7 +9,7 @@
                     // $target.parent().fadeTo(0, 0);
                     var suggested = false;
                     $.each(data.pulls, function (pullNo, pull) {
-                        if (typeof suggestion !== 'undefined' && pullNo && pullNo === suggestion) {
+                        if (typeof suggestion !== 'undefined' && pullNo && pullNo == suggestion) {
                             $target.append('<option value="' + pullNo + '" selected>' + pull.title + ' by ' + pull.user + ' (' + pullNo + ')</option>');
                             suggested = true;
                         } else {
