@@ -45,7 +45,7 @@ if (!empty($_SERVER['HTTP_REFERER']) && false !== strpos(
         $_SERVER['HTTP_REFERER'],
         'github.com/mautic/mautic/'
     )) {
-    $parts = explode('/', str_replace('https://github.com/mautic/mautic/', '', $_SERVER['HTTP_REFERER']));
+    $parts = explode('/', str_replace('https://github.com/mautic/mautic/pull/', '', $_SERVER['HTTP_REFERER']));
     if (isset($parts[0]) && is_numeric($parts[0])) {
         $suggestion = (int) $parts[0];
     }

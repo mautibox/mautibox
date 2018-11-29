@@ -7,8 +7,14 @@
                 // $target.append('<option value="staging">Latest version (staging)</option>');
                 if (typeof data.pulls !== 'undefined' || !data.pulls.length) {
                     // $target.parent().fadeTo(0, 0);
+                    var suggested = false;
                     $.each(data.pulls, function (pullNo, pull) {
-                        $target.append('<option value="' + pullNo + '">' + pull.title + ' by ' + pull.user + ' (' + pullNo + ')</option>');
+                        if (pullNo && pullNo === data.suggestion) {
+                            $target.append('<option value="' + pullNo + '" selected>' + pull.title + ' by ' + pull.user + ' (' + pullNo + ')</option>');
+                            suggested = true;
+                        } else {
+                            $target.append('<option value="' + pullNo + '">' + pull.title + ' by ' + pull.user + ' (' + pullNo + ')</option>');
+                        }
                     });
                     $('#spinner').hide();
                     // $target.fadeTo(3020, 1);
@@ -38,11 +44,13 @@
                         }
                     });
                     // $target.parent().fadeTo(1000, 1);
+                    if (suggested) {
+                        $target.trigger('change');
+                    }
                 }
                 else {
                     console.warn('Could not find pull request list. Try back later.');
                 }
-
             });
         }
     });
