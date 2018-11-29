@@ -87,7 +87,6 @@ function permissions {
 }
 
 function dependencies {
-    cd "$PULL"
     echo "Running composer"
     composer install --no-scripts --no-progress --no-suggest
 }
@@ -123,20 +122,9 @@ function cachewarm {
     console cache:warmup --no-optional-warmers --env=dev --quiet
 }
 
-function assets {
-    cd "$PULL"
-    echo "Generating assets"
-    if [ -f "$PULL/media/js/app.js" ] || [ -f "$PULL/media/js/app.css" ]
-    then
-        rm -f "$PULL/media/js/app.js"
-        rm -f "$PULL/media/js/app.css"
-        console mautic:assets:generate --env=dev
-    fi
-}
-
 function plugins {
     cd "$PULL"
-    echo "Re/loading plugins."
+    echo "Re/loading plugins and warming cache."
     console mautic:plugins:reload --env=dev
 }
 
@@ -274,10 +262,10 @@ else
             if [ ! -z "$OLDPATCH" ]
             then
                 echo "Reverting previous patch"
-                sudo git apply --exclude="media/*/app.*" --whitespace=nowarn --verbose -R "$PATCH"
+                sudo git apply --whitespace=nowarn --verbose -R "$PATCH"
                 if [ $? -ne 0 ]
                 then
-                    status 'error' 'Previous patch could not be reverted cleanly, I will have to rebuild.'
+                    status 'error' 'Previous patch could not be reverted cleanly.'
                     rm -rf "$PULL"
                     exit 1
                 fi
@@ -285,21 +273,16 @@ else
             cp "$PATCH.latest" "$PATCH"
             rm -f "$PATCH.latest"
             cd "$PULL"
-            sudo git apply --exclude="media/js/app.js" --exclude="media/css/app.css" --exclude="app/bundles/CampaignBundle/Tests/Command/campaign_schema.sql" --whitespace=nowarn --ignore-whitespace --inaccurate-eof --verbose "$PATCH"
+            sudo git apply --whitespace=nowarn --ignore-whitespace --inaccurate-eof "$PATCH"
             if [ $? -ne 0 ]
             then
-                status 'error' 'Patch could not be applied. Try rebasing the branch for this pull request.'
+                status 'error' 'Patch could not be applied cleanly.'
                 rm -rf "$PULL"
                 exit 1
             fi
             CHANGES=1
         else
             rm -f "$PATCH.latest"
-        fi
-        if [[ $OLDPATCH == *".js"* ]] || [[ $OLDPATCH == *".css"* ]] || [[ $NEWPATCH == *".js"* ]] || [[ $NEWPATCH == *".css"* ]]
-        then
-            status 'generating'
-            assets
         fi
     fi
 
@@ -313,12 +296,10 @@ else
     fi
 
     # Check for dependency changes.
-    if cmp -s "$STAGE/composer.lock" "$PULL/composer.lock"
+    if cmp "$STAGE/composer.lock" "$PULL/composer.lock"
     then
-        echo "No dependency changes."
-    else
-        echo "Dependency changes detected in lock."
-        status 'composing'
+        cd "$PULL"
+        echo "Dependency changes detected."
         dependencies
     fi
 
@@ -334,13 +315,11 @@ else
     echo "$DBCREATE"
     if [[ $DBCREATE == *"Skipped"* ]]
     then
-        status 'migrating'
         echo "Running migrations."
         console doctrine:migrations:migrate --no-interaction --env=dev
         echo "Forcing schema updates."
         console doctrine:schema:update --force --env=dev
     else
-        status 'installing'
         echo "Installing default data."
         console mautic:install:data --force --env=dev
         echo "Setting migration versions."
