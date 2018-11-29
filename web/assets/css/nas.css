@@ -750,3 +750,7 @@ footer ul {
     margin: 0;
 }
 
+.chosen-container .chosen-results li {
+    padding: 2px 6px;
+    line-height: 23px;
+}
