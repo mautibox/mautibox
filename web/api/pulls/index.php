@@ -41,11 +41,11 @@ if (!$simplified) {
 
 // Discern if we are coming from a github issue.
 $suggestion = null;
-if (!empty($_SERVER['HTTP_REFERER']) && false !== strpos(
-        $_SERVER['HTTP_REFERER'],
+if (!empty($_COOKIE['referrer']) && false !== strpos(
+        $_COOKIE['referrer'],
         'github.com/mautic/mautic/'
     )) {
-    $parts = explode('/', str_replace('https://github.com/mautic/mautic/pull/', '', $_SERVER['HTTP_REFERER']));
+    $parts = explode('/', str_ireplace('https://github.com/mautic/mautic/pull/', '', $_COOKIE['referrer']));
     if (isset($parts[0]) && is_numeric($parts[0])) {
         $suggestion = (int) $parts[0];
     }

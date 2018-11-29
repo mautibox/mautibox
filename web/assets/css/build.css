@@ -184,3 +184,8 @@ html {
     height: 100%;
     background-color: #00b49d;
 }
+
+.chosen-container .chosen-results li {
+    padding: 2px 6px;
+    line-height: 23px;
+}

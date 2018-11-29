@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+<?php
+if (!empty($_SERVER['HTTP_REFERER'])) {
+    setcookie('referrer', $_SERVER['HTTP_REFERER'], time() + (86400 * 30), '/');
+}
+?><!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
