@@ -71,23 +71,23 @@ function status {
 function permissions {
     echo "Enforcing permissions"
     touch app/config/local.php
-    mkdir -p app/cache \
-        app/logs \
-        app/spool \
+    mkdir -p var/cache \
+        var/logs \
+        var/spool \
         media/files \
         translations
     chown -R $USER:$USER .
     chgrp -R $USER . \
         app/bootstrap.php.cache \
         media \
-        app/cache \
-        app/logs
+        var/cache \
+        var/logs
     chmod -R u+rwX,go+rX,go-w .
     chmod -R ug+wx app/bootstrap.php.cache \
         app/config/local.php \
         media \
-        app/cache \
-        app/logs
+        var/cache \
+        var/logs
 }
 
 function dependencies {
