@@ -9,6 +9,10 @@ if [ -z "$STAGEFREQUENCY" ]
 then
     STAGEFREQUENCY=5
 fi
+if [ -z "$STAGING_BRANCH" ]
+then
+    STAGING_BRANCH=staging
+fi
 
 BASEDIR=$(dirname "$BASH_SOURCE")
 cd $BASEDIR/../
@@ -16,7 +20,7 @@ BASEDIR=$( pwd )
 REPO="https://github.com/mautic/mautic"
 USER="webapp"
 PULLNO="$1"
-STAGE="$BASEDIR/code/stage"
+STAGE="$BASEDIR/code/$STAGING_BRANCH"
 
 function dependencies {
     echo "Running composer"
@@ -29,10 +33,10 @@ then
     echo "Stage is recent enough. Updates every $STAGEFREQUENCY minutes."
     cd "$STAGE"
 else
-    echo "Refreshing stage copy"
+    echo "Refreshing $STAGING_BRANCH copy"
     if [ ! -d "$STAGE" ]
     then
-        git clone -b staging --single-branch --depth 1 $REPO.git "$STAGE"
+        git clone -b $STAGING_BRANCH --single-branch --depth 1 $REPO.git "$STAGE"
         cd "$STAGE"
     else
         cd "$STAGE"

@@ -34,6 +34,10 @@ if [ -z "$STAGEFREQUENCY" ]
 then
     STAGEFREQUENCY=30
 fi
+if [ -z "$STAGING_BRANCH" ]
+then
+    STAGING_BRANCH=staging
+fi
 
 BASEDIR=$(dirname "$BASH_SOURCE")
 cd $BASEDIR/../
@@ -41,7 +45,7 @@ BASEDIR=$( pwd )
 REPO="https://github.com/mautic/mautic"
 USER="webapp"
 PULLNO="$1"
-STAGE="$BASEDIR/code/stage"
+STAGE="$BASEDIR/code/$STAGING_BRANCH"
 DATA="$BASEDIR/code/data/$PULLNO"
 PULL="$BASEDIR/code/pulls/$PULLNO"
 WEB="$BASEDIR/web"
@@ -208,10 +212,10 @@ else
         cd "$STAGE"
         NEWSHA=$( git rev-parse --short HEAD )
     else
-        echo "Refreshing stage copy"
+        echo "Refreshing $STAGING_BRANCH copy"
         if [ ! -d "$STAGE" ]
         then
-            git clone -b staging --single-branch --depth 1 $REPO.git "$STAGE"
+            git clone -b $STAGING_BRANCH --single-branch --depth 1 $REPO.git "$STAGE"
             cd "$STAGE"
         else
             cd "$STAGE"
@@ -245,7 +249,7 @@ else
         CHANGES=1
     fi
 
-    if [ "$PULLNO" != "staging" ]
+    if [ "$PULLNO" != "$STAGING_BRANCH" ]
     then
         # Check if a patch is needed or has already been applied.
         mkdir -p "$PATCHDIR"

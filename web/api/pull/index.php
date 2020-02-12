@@ -87,7 +87,7 @@ if (!$pullNumber) {
     $pullNumber = !empty($urlParts[0]) && is_numeric(trim($urlParts[0])) ? (int) $urlParts[0] : null;
 }
 if (!$pullNumber) {
-    $pullNumber = !empty($_GET['pullNo']) && 'staging' == trim($_GET['pullNo']) ? 'staging' : null;
+    $pullNumber = !empty($_GET['pullNo']) && getenv('STAGING_BRANCH') == trim($_GET['pullNo']) ? getenv('STAGING_BRANCH') : null;
 }
 if (!$pullNumber) {
     header("HTTP/1.0 404 Not Found");
@@ -106,7 +106,7 @@ $build = [
 
 $cached = $pool->get($key);
 $pull   = [];
-if ($pullNumber === 'staging') {
+if ($pullNumber === getenv('STAGING_BRANCH')) {
     $queueFile = BASE.'/queue/'.$pullNumber.'.pull';
     if (!is_file($queueFile)) {
         file_put_contents($queueFile, time());

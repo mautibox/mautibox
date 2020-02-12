@@ -17,7 +17,7 @@ if (!$simplified) {
     // Get all open PRs sorted by popularity.
     $params  = [
         'state'     => 'open',
-        'base'      => 'staging',
+        'base'      => getenv('STAGING_BRANCH'),
         'sort'      => 'popularity',
         'direction' => 'desc',
         'per_page'  => 100,

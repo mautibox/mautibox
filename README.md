@@ -7,6 +7,7 @@ A sandbox for testing the open marketing automation software [Mautic](https://gi
     APP_URL             - URL for Mautibox
     GH_TOKEN            - Github user token (for public repo read access)
     FREQUENCY           - Frequency of build updates (default 5min)
+    STAGING_BRANCH      - Branch to base all PR merges on.
     RDS_HOSTNAME        - Set by EB
     RDS_PORT            - Set by EB
     RDS_DB_NAME         - Set by EB
