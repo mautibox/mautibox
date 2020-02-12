@@ -30,7 +30,7 @@ $parameters = [
     'mailer_spool_type'     => 'file',
     'mailer_spool_path'     => '/tmp/'.PULL.'/spool',
     'secret_key'            => '68c7e75470c02cba06dd543431411e0de94e04fdf2b3a2eac05957060edb66d0',
-    'cache_path'            => realpath(MAUTIC_ROOT_DIR.'/app/cache'),
+    'cache_path'            => realpath(MAUTIC_ROOT_DIR.'/var/cache'),
     'log_path'              => realpath(MAUTIC_ROOT_DIR.'/../../data/'.PULL),
     'tmp_path'              => '/tmp/'.PULL,
 ];
