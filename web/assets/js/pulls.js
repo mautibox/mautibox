@@ -4,7 +4,7 @@
         if ($target.length) {
             $.getJSON('/api/pulls/', function (data) {
                 // console.log(data);
-                // $target.append('<option value="staging">Latest version (staging)</option>');
+                $target.append('<option value="3x">Latest Version (3x branch)</option>');
                 if (typeof data.pulls !== 'undefined' || !data.pulls.length) {
                     // $target.parent().fadeTo(0, 0);
                     var suggested = false;

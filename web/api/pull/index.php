@@ -107,7 +107,7 @@ $build = [
 $cached = $pool->get($key);
 $pull   = [];
 if ($pullNumber === getenv('STAGING_BRANCH')) {
-    $queueFile = BASE.'/queue/'.$pullNumber.'.pull';
+    $queueFile = BASE.'/queue/'.getenv('STAGING_BRANCH').'.pull';
     if (!is_file($queueFile)) {
         file_put_contents($queueFile, time());
     }
