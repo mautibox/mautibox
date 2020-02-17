@@ -44,7 +44,12 @@ cd $BASEDIR/../
 BASEDIR=$( pwd )
 REPO="https://github.com/mautic/mautic"
 USER="webapp"
-PULLNO="$1"
+if [ "$1" == "$STAGING_BRANCH" ]
+then
+  PULLNO="$1-live"
+else
+  PULLNO="$1"
+fi
 STAGE="$BASEDIR/code/$STAGING_BRANCH"
 DATA="$BASEDIR/code/data/$PULLNO"
 PULL="$BASEDIR/code/pulls/$PULLNO"
@@ -239,7 +244,7 @@ else
     if [ "$NEWSHA" != "$SHA" ]
     then
         unlink
-        echo "Syncing pull request workspace."
+        echo "Syncing request workspace."
         sudo rsync -aLrWq --delete --force $STAGE/ $PULL
         if [ $? -ne 0 ]
         then
@@ -249,7 +254,7 @@ else
         CHANGES=1
     fi
 
-    if [ "$PULLNO" != "$STAGING_BRANCH" ]
+    if [ "$PULLNO" != "$STAGING_BRANCH-live" ]
     then
         # Check if a patch is needed or has already been applied.
         mkdir -p "$PATCHDIR"
