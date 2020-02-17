@@ -14,6 +14,7 @@ namespace Mautic\Middleware\Dev;
 use Mautic\Middleware\ConfigAwareTrait;
 use Mautic\Middleware\PrioritizedMiddlewareInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
@@ -34,13 +35,21 @@ class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMiddleware
 
     /**
      * CatchExceptionMiddleware constructor.
-     *
-     * @param HttpKernelInterface $app
      */
     public function __construct(HttpKernelInterface $app)
     {
         $this->app        = $app;
         $this->allowedIps = ['127.0.0.1', 'fe80::1', '::1'];
+
+        $parameters = $this->getConfig();
+        if (array_key_exists('dev_hosts', $parameters) && is_array($parameters['dev_hosts'])) {
+            $this->allowedIps = array_merge($this->allowedIps, $parameters['dev_hosts']);
+        }
+
+        if (isset($_SERVER['MAUTIC_DEV_HOSTS'])) {
+            $localIps         = explode(' ', $_SERVER['MAUTIC_DEV_HOSTS']);
+            $this->allowedIps = array_merge($this->allowedIps, $localIps);
+        }
     }
 
     /**
