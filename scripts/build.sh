@@ -65,7 +65,7 @@ function status {
     then
         echo "Error: $2"
     fi
-    echo '{"sha":"'$SHA'","date":"'$DATE'","pull":'$PULLNO',"status":"'$1'","error":"'$2'"}' > "$DATA/build.json"
+    echo '{"sha":"'$SHA'","date":"'$DATE'","pull":"'$PULLNO'","status":"'$1'","error":"'$2'"}' > "$DATA/build.json"
 }
 
 function permissions {
