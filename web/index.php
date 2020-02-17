@@ -47,7 +47,7 @@ if (!$suggestion && !empty($_COOKIE['suggestion'])) {
             <div class="triangles hero" id="triangles">
                 <div id="output"></div>
                 <h1>
-                    Let's Test Mautic
+                    Let's Test Mautic 3
                     <form action="#">
                         <div id="spinner">
                             Please wait...
@@ -71,6 +71,15 @@ if (!$suggestion && !empty($_COOKIE['suggestion'])) {
                                 A sandbox for testing the open marketing automation software <a href="https://mautic.org">Mautic</a>.
                                 New features and fixes can be tested here by humans (like you, probably).
                                 To begin, just select what you wish to test above.
+                            </p>
+                        </div>
+                        <div class="col s12 l6">
+                            <h2>Mautic 2</h2>
+                        </div>
+                        <div class="col s12 l6">
+                            <p class="flow-text">
+                                This domain is for testing Mautic 3. <br/>
+                                To test Mautic 2, got to <a href="https://mautibox.com">mautibox.com</a>
                             </p>
                         </div>
                     </div>
