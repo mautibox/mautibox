@@ -14,7 +14,7 @@ $parameters = [
     'db_table_prefix'       => PULL.'_',
     'db_host'               => getenv('RDS_HOSTNAME') ?: 'localhost',
     'db_port'               => getenv('RDS_PORT') ?: '3306',
-    'db_name'               => 'mautic_'.PULL,
+    'db_name'               => 'mautic_'.str_replace('.', '_', PULL),
     'db_user'               => getenv('RDS_USERNAME') ?: 'root',
     'db_password'           => getenv('RDS_PASSWORD') ?: 'root',
     'site_url'              => getenv('APP_URL').'/'.PULL,
@@ -30,7 +30,7 @@ $parameters = [
     'mailer_spool_type'     => 'file',
     'mailer_spool_path'     => '/tmp/'.PULL.'/spool',
     'secret_key'            => '68c7e75470c02cba06dd543431411e0de94e04fdf2b3a2eac05957060edb66d0',
-    'cache_path'            => realpath(MAUTIC_ROOT_DIR.'/var/cache'),
+    'cache_path'            => realpath(MAUTIC_ROOT_DIR.'/app/cache'),
     'log_path'              => realpath(MAUTIC_ROOT_DIR.'/../../data/'.PULL),
     'tmp_path'              => '/tmp/'.PULL,
 ];

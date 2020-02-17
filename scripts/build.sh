@@ -44,12 +44,7 @@ cd $BASEDIR/../
 BASEDIR=$( pwd )
 REPO="https://github.com/mautic/mautic"
 USER="webapp"
-if [ "$1" == "$STAGING_BRANCH" ]
-then
-  PULLNO="$1-live"
-else
-  PULLNO="$1"
-fi
+PULLNO="$1"
 STAGE="$BASEDIR/code/$STAGING_BRANCH"
 DATA="$BASEDIR/code/data/$PULLNO"
 PULL="$BASEDIR/code/pulls/$PULLNO"
@@ -75,6 +70,7 @@ function status {
 
 function permissions {
     echo "Enforcing permissions"
+    cd "$PULL"
     touch app/config/local.php
     mkdir -p var/cache \
         var/logs \
@@ -127,6 +123,7 @@ function cacheclear {
 }
 
 function cachewarm {
+    status 'warming'
     cd "$PULL"
     echo "Warming up caches"
     console cache:warmup --no-optional-warmers --env=dev --quiet
@@ -195,7 +192,34 @@ function dataprep {
     fi
 }
 
-if [ ! -z $( find "$PATCH" -mmin -$PULLFREQUENCY 2>/dev/null ) ]
+function database {
+    echo "Re/loading database."
+    cd "$PULL"
+    DBCREATE=$( console doctrine:database:create --no-interaction --if-not-exists --env=dev )
+    echo "$DBCREATE"
+    if [[ $DBCREATE == *"Skipped"* ]]
+    then
+        status 'migrating'
+        echo "Running migrations."
+        console doctrine:migrations:migrate --no-interaction --env=dev
+        echo "Forcing schema updates."
+        console doctrine:schema:update --force --env=dev
+    else
+        status 'installing'
+        echo "Installing default data."
+        console mautic:install:data --force --env=dev
+        echo "Setting migration versions."
+        console doctrine:migrations:version --add --all --no-interaction --env=dev
+    fi
+    if [ $? -ne 0 ]
+    then
+        unlink
+        status 'error' 'DB Could not be prepared.'
+        exit 1
+    fi
+}
+
+if [ "$PULLNO" != "$STAGING_BRANCH" ] && [ ! -z $( find "$PATCH" -mmin -$PULLFREQUENCY 2>/dev/null ) ]
 then
     echo "The PULL is recent enough. Builds permitted every $PULLFREQUENCY minutes."
 else
@@ -248,13 +272,23 @@ else
         sudo rsync -aLrWq --delete --force $STAGE/ $PULL
         if [ $? -ne 0 ]
         then
-            status 'error' 'Could not synchronize files.'
-            exit 1
+            # try again 2
+            sudo rsync -aLrWq --delete --force $STAGE/ $PULL
+            if [ $? -ne 0 ]
+            then
+                # try again 3
+                sudo rsync -aLrWq --delete --force $STAGE/ $PULL
+                if [ $? -ne 0 ]
+                then
+                    status 'error' 'Could not synchronize files.'
+                    exit 1
+                fi
+            fi
         fi
         CHANGES=1
     fi
 
-    if [ "$PULLNO" != "$STAGING_BRANCH-live" ]
+    if [ "$PULLNO" != "$STAGING_BRANCH" ]
     then
         # Check if a patch is needed or has already been applied.
         mkdir -p "$PATCHDIR"
@@ -337,34 +371,10 @@ else
 
     permissions
 
-    echo "Re/loading database."
-    cd "$PULL"
-    DBCREATE=$( console doctrine:database:create --no-interaction --if-not-exists --env=dev )
-    echo "$DBCREATE"
-    if [[ $DBCREATE == *"Skipped"* ]]
-    then
-        status 'migrating'
-        echo "Running migrations."
-        console doctrine:migrations:migrate --no-interaction --env=dev
-        echo "Forcing schema updates."
-        console doctrine:schema:update --force --env=dev
-    else
-        status 'installing'
-        echo "Installing default data."
-        console mautic:install:data --force --env=dev
-        echo "Setting migration versions."
-        console doctrine:migrations:version --add --all --no-interaction --env=dev
-    fi
-    if [ $? -ne 0 ]
-    then
-        unlink
-        status 'error' 'DB Could not be prepared.'
-        exit 1
-    fi
+    database
 
     link
 
-    status 'warming'
     cachewarm
 
     plugins
