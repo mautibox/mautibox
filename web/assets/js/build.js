@@ -205,18 +205,13 @@
     // Discern the PR number and get details.
     var parts = window.location.pathname.split('/');
     if (typeof parts[1] !== 'undefined') {
-        if (parts[1] === 'staging') {
-            check_for_build('staging');
+        var pullNo = parts[1].match(/^\d+$/) ? parseInt(parts[1]) : parts[1];
+        if (pullNo) {
+            check_for_build(pullNo);
         }
         else {
-            var pullNo = parts[1].match(/^\d+$/) ? parseInt(parts[1]) : parts[1];
-            if (pullNo) {
-                check_for_build(pullNo);
-            }
-            else {
-                build_overlay_load('<h1>GREETINGS HUMAN</h1><h4>There is a problem is between your keyboard and chair. Please try a pull request number.</h4>');
-                build_overlay_sad();
-            }
+            build_overlay_load('<h1>GREETINGS HUMAN</h1><h4>There is a problem is between your keyboard and chair. Please try a pull request number.</h4>');
+            build_overlay_sad();
         }
     }
 })();

@@ -97,11 +97,12 @@ $key   = 'mautic_pull_'.$pullNumber;
 $ttl   = 60;
 $pool  = new Cache\Adapter\Apcu\ApcuCachePool();
 $build = [
-    'sha'    => '',
-    'date'   => '',
-    'pull'   => $pullNumber,
-    'status' => 'queued',
-    'error'  => '',
+    'sha'     => '',
+    'date'    => '',
+    'pull'    => $pullNumber,
+    'status'  => 'queued',
+    'error'   => '',
+    'staging' => getenv('STAGING_BRANCH'),
 ];
 
 $cached = $pool->get($key);
