@@ -209,7 +209,7 @@
             check_for_build('staging');
         }
         else {
-            var pullNo = parseInt(parts[1]);
+            var pullNo = parts[1].match(/^\d+$/) ? parseInt(parts[1]) : parts[1];
             if (pullNo) {
                 check_for_build(pullNo);
             }

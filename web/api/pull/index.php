@@ -81,7 +81,7 @@ require_once __DIR__.'/../../../vendor/autoload.php';
 define('BASE', realpath(__DIR__.'/../../../'));
 $error      = null;
 $message    = null;
-$pullNumber = !empty($_GET['pullNo']) ? (int) $_GET['pullNo'] : null;
+$pullNumber = !empty($_GET['pullNo']) ? (is_numeric($_GET['pullNo']) ? (int) $_GET['pullNo'] : trim($_GET['pullNo'])) : null;
 if (!$pullNumber) {
     $urlParts   = explode('/', ltrim($_SERVER['REQUEST_URI'], '/'));
     $pullNumber = !empty($urlParts[0]) && is_numeric(trim($urlParts[0])) ? (int) $urlParts[0] : null;
@@ -106,7 +106,7 @@ $build = [
 
 $cached = $pool->get($key);
 $pull   = [];
-if ($pullNumber === getenv('STAGING_BRANCH')) {
+if ($pullNumber == getenv('STAGING_BRANCH')) {
     $queueFile = BASE.'/queue/'.getenv('STAGING_BRANCH').'.pull';
     if (!is_file($queueFile)) {
         file_put_contents($queueFile, time());
