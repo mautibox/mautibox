@@ -36,11 +36,11 @@ $container->loadFromExtension(
         'globals'          => [
             'mautic_version' => MAUTIC_VERSION,
             'pull_request'   => PULL,
-            'pull_title'     => !empty($pull_title) ? $pull_title : 'Pull Request',
-            'pull_body'      => !empty($pull_body) ? $pull_body : 'NA',
-            'pull_labels'    => !empty($pull_labels) ? $pull_labels : 'NA',
-            'pull_user'      => !empty($pull_user) ? $pull_user : 'NA',
-            'pull_avatar'    => !empty($pull_avatar) ? $pull_avatar : 'NA',
+            'pull_title'     => !empty($pull_title) ? $pull_title : 'Branch',
+            'pull_body'      => !empty($pull_body) ? $pull_body : '',
+            'pull_labels'    => !empty($pull_labels) ? $pull_labels : '',
+            'pull_user'      => !empty($pull_user) ? $pull_user : 'https://github.com/mautic/mautic',
+            'pull_avatar'    => !empty($pull_avatar) ? $pull_avatar : 'https://avatars2.githubusercontent.com/u/5257677?s=200&v=4',
         ],
     ]
 );
