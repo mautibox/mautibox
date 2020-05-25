@@ -207,7 +207,9 @@ function database {
     else
         status 'installing'
         echo "Installing default data."
-        console mautic:install:data --force --env=dev
+        # Mautic 3 now purges the db prior to demo data insertion.
+        console doctrine:fixtures:load -n --env=dev
+        # console mautic:install:data --force --env=dev
         echo "Setting migration versions."
         console doctrine:migrations:version --add --all --no-interaction --env=dev
     fi
