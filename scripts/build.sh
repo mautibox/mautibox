@@ -206,12 +206,15 @@ function database {
         console doctrine:schema:update --force --env=dev
     else
         status 'installing'
-        echo "Installing default data."
+        echo "Running initial schema creation."
+        # Mautic 3 now does not create schema on db creation. It is a sepperate step.
+        console doctrine:schema:create --env=dev --no-interaction
+        echo "Setting migration versions."
+        console doctrine:migrations:version --add --all --no-interaction --env=dev
+        echo "Installing default fixtures."
         # Mautic 3 now purges the db prior to demo data insertion.
         console doctrine:fixtures:load --append --env=dev -n
         # console mautic:install:data --force --env=dev
-        echo "Setting migration versions."
-        console doctrine:migrations:version --add --all --no-interaction --env=dev
     fi
     if [ $? -ne 0 ]
     then
