@@ -3,8 +3,8 @@
     // Mesh Properties
     //------------------------------
     var MESH = {
-        width: 1.2,
-        height: 1.2,
+        width: 1.4,
+        height: 1.4,
         depth: 10,
         segments: 16,
         slices: 8,
@@ -13,7 +13,7 @@
         zRange: 1.0,
         ambient: '#555555',
         diffuse: '#ffd29b',
-        speed: 0.0003
+        speed: 0.0004
     };
 
     //------------------------------
@@ -24,7 +24,7 @@
         xyScalar: 1,
         zOffset: 300,
         ambient: '#4e5e9e',
-        diffuse: '#5b02ff',
+        diffuse: '#6518ef',
         speed: 0.001,
         gravity: 1200,
         dampening: 0.95,
