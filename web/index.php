@@ -47,7 +47,7 @@ if (!$suggestion && !empty($_COOKIE['suggestion'])) {
             <div class="triangles hero" id="triangles">
                 <div id="output"></div>
                 <h1>
-                    Let's Test Mautic 3
+                    Let's Test Mautic&nbsp;3
                     <form action="#">
                         <div id="spinner">
                             Please wait...
