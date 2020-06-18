@@ -45,6 +45,7 @@ BASEDIR=$( pwd )
 REPO="https://github.com/mautic/mautic"
 USER="webapp"
 PULLNO="$1"
+DROP="$3"
 STAGE="$BASEDIR/code/$STAGING_BRANCH"
 DATA="$BASEDIR/code/data/$PULLNO"
 PULL="$BASEDIR/code/pulls/$PULLNO"
@@ -189,6 +190,19 @@ function dataprep {
         chown -R $USER:$USER "$DATA"
         chgrp -R $USER "$DATA"
         chmod -R ug+wx "$DATA"
+    fi
+}
+
+function drop {
+    echo "Purging database."
+    cd "$PULL"
+    DBDROP=$( console doctrine:database:drop --no-interaction --env=dev )
+    echo "$DBDROP"
+    if [ $? -ne 2 ]
+    then
+        unlink
+        status 'error' 'DB Could not be dropped.'
+        exit 1
     fi
 }
 
@@ -375,6 +389,11 @@ else
     cacheclear
 
     permissions
+
+    if [ "$PULLNO" = "$STAGING_BRANCH" ] && [ "$DROP" = "drop" ]
+    then
+        drop
+    fi
 
     database
 

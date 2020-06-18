@@ -47,7 +47,7 @@ if (!$suggestion && !empty($_COOKIE['suggestion'])) {
             <div class="triangles hero" id="triangles">
                 <div id="output"></div>
                 <h1>
-                    Let's Test Mautic&nbsp;3
+                    Let's Test Mautic
                     <form action="#">
                         <div id="spinner">
                             Please wait...
@@ -74,12 +74,12 @@ if (!$suggestion && !empty($_COOKIE['suggestion'])) {
                             </p>
                         </div>
                         <div class="col s12 l6">
-                            <h2>Mautic 2</h2>
+                            <h2>Mail</h2>
                         </div>
                         <div class="col s12 l6">
                             <p class="flow-text">
-                                This domain is for testing Mautic 3. <br/>
-                                To test Mautic 2, got to <a href="https://mautibox.com">mautibox.com</a>
+                                This service cannot send outgoing real-world email, <br/>
+                                To view the email that would have been sent see <a href="/mail">/mail</a>
                             </p>
                         </div>
                     </div>
