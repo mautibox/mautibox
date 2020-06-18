@@ -73,23 +73,25 @@ if (!$suggestion && !empty($_COOKIE['suggestion'])) {
                                 To begin, just select what you wish to test above.
                             </p>
                         </div>
-                        <div class="col s12 l6">
+                        <div class="col s12 l6 clearfix">
                             <h2>Mail</h2>
                             <h3>Where did it go?</h3>
                         </div>
                         <div class="col s12 l6">
                             <p class="flow-text">
                                 This service cannot send outgoing real-world email, <br/>
-                                To view the email that would have been sent see <a href="/mail">/mail</a>
+                                To view the email that would have been sent see <a href="/mail">/mail</a>.<br/>
+                                This is a service called MailHog, and it's awesome for testing outgoing email.
                             </p>
                         </div>
-                        <div class="col s12 l6">
+                        <div class="col s12 l6 clearfix">
                             <h2>Mautic 2</h2>
                             <h3>How do I test?</h3>
                         </div>
                         <div class="col s12 l6">
                             <p class="flow-text">
-                                Pull requests for Mautic 2 are no longer supported here as we've transitioned fully to Mautic 3. To test Mautic 2 code, you will need to do it locally now.
+                                Pull requests for Mautic 2 are no longer supported here as we've transitioned fully to Mautic 3.
+                                To test Mautic 2 code, you will need to do it locally now.
                             </p>
                         </div>
                     </div>
