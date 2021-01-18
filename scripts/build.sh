@@ -90,7 +90,6 @@ function permissions {
 }
 
 function dependencies {
-    cd "$PULL"
     echo "Running composer"
     composer install --no-scripts --no-progress --no-suggest
 }
@@ -378,6 +377,7 @@ else
     else
         echo "Dependency changes detected in lock."
         status 'composing'
+        cd "$PULL"
         dependencies
     fi
 
