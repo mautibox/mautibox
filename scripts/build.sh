@@ -34,10 +34,6 @@ if [ -z "$STAGEFREQUENCY" ]
 then
     STAGEFREQUENCY=30
 fi
-if [ -z "$STAGING_BRANCH" ]
-then
-    STAGING_BRANCH=staging
-fi
 
 BASEDIR=$(dirname "$BASH_SOURCE")
 cd $BASEDIR/../
@@ -46,6 +42,7 @@ REPO="https://github.com/mautic/mautic"
 USER="webapp"
 PULLNO="$1"
 DROP="$3"
+STAGING_BRANCH=$(php -f $BASEDIR/scripts/getstage.php $PULLNO)
 STAGE="$BASEDIR/code/$STAGING_BRANCH"
 DATA="$BASEDIR/code/data/$PULLNO"
 PULL="$BASEDIR/code/pulls/$PULLNO"

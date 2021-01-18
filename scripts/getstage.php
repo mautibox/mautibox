@@ -46,4 +46,6 @@ if (!$simplified) {
 
 if (isset($argv[1]) && isset($simplified[$argv[1]])) {
     echo $simplified[$argv[1]]['base'];
+} else {
+    echo getenv('STAGING_BRANCH');
 }
