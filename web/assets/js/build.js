@@ -100,18 +100,14 @@
                 });
 
             // Fade in images once loaded.
-            $overlay.find('img').each(function () {
-                if ($(this).attr('url').length) {
-                    $(this).load(function () {
-                        $(this).fadeTo(4000, 1);
-                        // Start the fancy stuff after a while
-                        setTimeout(function () {
-                            if (!sad) {
-                                $overlay.addClass('build-overlay-loaded');
-                            }
-                        }, 4000);
-                    });
-                }
+            $overlay.find('img').on('load', function () {
+                $(this).fadeTo(4000, 1);
+                // Start the fancy stuff after a while
+                setTimeout(function () {
+                    if (!sad) {
+                        $overlay.addClass('build-overlay-loaded');
+                    }
+                }, 4000);
             });
 
             // Start animating the progress bar
