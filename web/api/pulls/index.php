@@ -6,7 +6,6 @@ $key        = 'mautic_pulls';
 $ttl        = 300;
 $pool       = new Cache\Adapter\Apcu\ApcuCachePool();
 $simplified = $pool->get($key);
-$simplified = false;
 if (!$simplified) {
     $simplified = [];
     $client     = new Github\Client();
@@ -17,7 +16,6 @@ if (!$simplified) {
     // Get all open PRs sorted by popularity.
     $params  = [
         'state'     => 'open',
-        'base'      => getenv('STAGING_BRANCH'),
         'sort'      => 'popularity',
         'direction' => 'desc',
         'per_page'  => 100,
@@ -26,9 +24,14 @@ if (!$simplified) {
     $pulls   = $pager->fetch($repoApi, 'all', ['mautic', 'mautic', $params]);
     while (!empty($pulls)) {
         foreach ($pulls as $pull) {
+            // Mautic 2 branches no longer supported.
+            if (0 === strpos($pull['base']['ref'], '2.')) {
+                continue;
+            }
             $simplified[(string) $pull['number']] = [
                 'title' => $pull['title'],
                 'user'  => !empty($pull['user']['login']) ? $pull['user']['login'] : '',
+                'base'  => $pull['base']['ref'] ?? getenv('STAGING_BRANCH'),
             ];
         }
         $pulls = [];

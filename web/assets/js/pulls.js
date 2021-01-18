@@ -10,10 +10,10 @@
                     var suggested = false;
                     $.each(data.pulls, function (pullNo, pull) {
                         if (typeof suggestion !== 'undefined' && pullNo && pullNo == suggestion) {
-                            $target.append('<option value="' + pullNo + '" selected>' + pull.title + ' by ' + pull.user + ' (' + pullNo + ')</option>');
+                            $target.append('<option value="' + pullNo + '" selected>' + pull.title + ' by ' + pull.user + ' ' + pullNo + ' → ' + pull.base + '</option>');
                             suggested = true;
                         } else {
-                            $target.append('<option value="' + pullNo + '">' + pull.title + ' by ' + pull.user + ' (' + pullNo + ')</option>');
+                            $target.append('<option value="' + pullNo + '">' + pull.title + ' by ' + pull.user + ' ' + pullNo + ' → ' + pull.base + '</option>');
                         }
                     });
                     $('#spinner').hide();
