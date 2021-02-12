@@ -194,12 +194,12 @@ function drop {
     cd "$PULL"
     DBDROP=$( console doctrine:database:drop --no-interaction --env=dev --force )
     echo "$DBDROP"
-    if [ $? -ne 2 ]
-    then
-        unlink
-        status 'error' 'DB Could not be dropped.'
-        exit 1
-    fi
+#     if [ $? -ne 2 ]
+#     then
+#         unlink
+#         status 'error' 'DB Could not be dropped.'
+#         exit 1
+#     fi
 }
 
 function database {
