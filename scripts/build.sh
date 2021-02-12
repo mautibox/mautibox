@@ -192,7 +192,7 @@ function dataprep {
 function drop {
     echo "Purging database."
     cd "$PULL"
-    DBDROP=$( console doctrine:database:drop --no-interaction --env=dev )
+    DBDROP=$( console doctrine:database:drop --no-interaction --env=dev --force )
     echo "$DBDROP"
     if [ $? -ne 2 ]
     then
@@ -234,12 +234,18 @@ function database {
     fi
 }
 
-if [ "$PULLNO" != "$STAGING_BRANCH" ] && [ ! -z $( find "$PATCH" -mmin -$PULLFREQUENCY 2>/dev/null ) ]
+if [ "$PULLNO" != "$STAGING_BRANCH" ] && [ ! -z $( find "$PATCH" -mmin -$PULLFREQUENCY 2>/dev/null ) ] && [ "$DROP" != "drop" ]
 then
     echo "The PULL is recent enough. Builds permitted every $PULLFREQUENCY minutes."
 else
     # Prep data folder.
     dataprep
+
+    if [ "$DROP" = "drop" ]
+    then
+        unlink
+        rm -rf "$PULL"
+    fi
 
     #  Prep pull folder and build status.
     if [ ! -d "$PULL" ]
@@ -387,7 +393,7 @@ else
 
     permissions
 
-    if [ "$PULLNO" = "$STAGING_BRANCH" ] && [ "$DROP" = "drop" ]
+    if [ "$PULLNO" = "$STAGING_BRANCH" ] || [ "$DROP" = "drop" ]
     then
         drop
     fi
